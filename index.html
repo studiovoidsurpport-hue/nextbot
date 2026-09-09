@@ -691,7 +691,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, query,
-  orderBy, onSnapshot, serverTimestamp, where, limit, getDocs, arrayUnion, arrayRemove, runTransaction
+  orderBy, onSnapshot, serverTimestamp, where, limit, getDocs, arrayUnion, arrayRemove, runTransaction, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getDatabase, ref, set, onValue, onDisconnect, remove, push, serverTimestamp as rtdbTimestamp, off
@@ -771,6 +771,7 @@ const HELP_COMMANDS = [
   { cmd:"/8볼 질문", desc:"마법의 8번 공에게 질문해요." },
   { cmd:"/온라인", desc:"현재 접속 중인 팀원을 알려줘요." },
   { cmd:"/디데이", desc:"대회까지 남은 날짜를 알려줘요." },
+  { cmd:"/순위", desc:"이번 주 채팅 활동 랭킹(진행 중)을 보여줘요." },
   { cmd:"/help 또는 /도움말", desc:"이 명령어 목록을 보여줘요." },
 ];
 const HELP_ADMIN_COMMANDS = [
@@ -778,6 +779,14 @@ const HELP_ADMIN_COMMANDS = [
   { cmd:"/일정 제목|YYYY-MM-DD", desc:"일정을 추가하고 봇이 알려요. (관리자)" },
   { cmd:"/채널생성 카테고리명|채널명", desc:"채널을 새로 만들어요. (관리자)" },
 ];
+
+/* ---------------- MVP 자동 선정 설정 ----------------
+   매주 월요일(주 시작), 지난주 채팅 활동(메시지+리액션)을 집계해 TOP3를 뽑고
+   봇이 투표를 올립니다. 그 다음 주가 시작되면 투표를 집계해 우승자를 발표해요.
+*/
+const MVP_MSG_WEIGHT = 1;   // 메시지 1개당 점수
+const MVP_REACT_WEIGHT = 2; // 받은 리액션 1개당 점수
+const MVP_TOP_N = 3;
 
 /* ---------------- State ---------------- */
 let currentUser=null, myDoc=null;
@@ -1565,6 +1574,7 @@ async function sendMessage(){
     await addDoc(collection(db,'channels',currentChannelId,'messages'), payload);
     updateDoc(doc(db,'channels',currentChannelId), { lastMessageAt: serverTimestamp() }).catch(()=>{});
     pushMentionNotifications(payload.mentions, text);
+    bumpStat('msgCount', currentUser.uid);
     msgInput.value=''; msgInput.style.height='auto';
     replyTarget=null; renderReplyPreview();
     pendingAttachments=[]; renderAttachPreview();
@@ -1593,6 +1603,123 @@ function postBotReply(text){
   const target = (currentChannelId && !FEATURE_CHANNELS[currentChannelId]) ? currentChannelId : BOT_CHANNEL_ID;
   sendBotMessage(target, text);
 }
+
+/* ---------------- MVP 자동 선정: 주간 활동 통계 + 투표 + 발표 ---------------- */
+function getMonday(d){
+  const date=new Date(d);
+  const day=date.getDay(); // 0=일 ... 6=토
+  const diffToMon = (day===0) ? -6 : (1-day);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate()+diffToMon);
+  return date;
+}
+function weekIdOf(d){
+  const m=getMonday(d);
+  const y=m.getFullYear(), mo=String(m.getMonth()+1).padStart(2,'0'), da=String(m.getDate()).padStart(2,'0');
+  return `${y}-${mo}-${da}`;
+}
+function prevWeekId(weekId){
+  const [y,m,d]=weekId.split('-').map(Number);
+  const dt=new Date(y,m-1,d);
+  dt.setDate(dt.getDate()-7);
+  return weekIdOf(dt);
+}
+function bumpStat(field, uid, n=1){
+  if(!uid) return;
+  const wk=weekIdOf(new Date());
+  setDoc(doc(db,'stats',wk), { [field]: { [uid]: increment(n) } }, { merge:true }).catch(e=>console.error('stat bump error', e));
+}
+async function computeRanking(weekId){
+  const snap=await getDoc(doc(db,'stats',weekId));
+  const data = snap.exists() ? snap.data() : {};
+  const msgCount = data.msgCount||{}, reactCount = data.reactCount||{};
+  const uids = new Set([...Object.keys(msgCount), ...Object.keys(reactCount)]);
+  const rows=[];
+  uids.forEach(uid=>{
+    const u = usersMap[uid];
+    if(!u || u.isBot) return;
+    if(u.isAdmin) return; // 관리자는 MVP 후보에서 제외
+    const m=msgCount[uid]||0, r=reactCount[uid]||0;
+    const score = m*MVP_MSG_WEIGHT + r*MVP_REACT_WEIGHT;
+    if(score>0) rows.push({ uid, nickname:u.nickname||'?', msgCount:m, reactCount:r, score });
+  });
+  rows.sort((a,b)=>b.score-a.score);
+  return rows;
+}
+async function createWeeklyMvpPoll(curWeek, statsWeek){
+  const ref=doc(db,'mvp_weeks',curWeek);
+  try{
+    const ranking = await computeRanking(statsWeek);
+    const top = ranking.slice(0, MVP_TOP_N);
+    if(top.length<2){
+      await setDoc(ref, { weekId:curWeek, statsWeek, skipped:true, reason:'참여 인원 부족', createdAt: serverTimestamp() });
+      return;
+    }
+    const pollPayload = {
+      userId: currentUser.uid, isBot:true, type:'poll',
+      question: `🏆 이번 주 MVP 투표 (지난주 채팅 활동 TOP${top.length})`,
+      options: top.map(c=>({ text:c.nickname, votes:[] })),
+      createdAt: serverTimestamp()
+    };
+    const msgRef = await addDoc(collection(db,'channels',BOT_CHANNEL_ID,'messages'), pollPayload);
+    updateDoc(doc(db,'channels',BOT_CHANNEL_ID), { lastMessageAt: serverTimestamp() }).catch(()=>{});
+    await sendBotMessage(BOT_CHANNEL_ID, `📊 지난주 채팅 활동(메시지+리액션) 기준 TOP${top.length}이 나왔어요! 위 투표로 이번 주 MVP를 뽑아주세요. (관리자 제외)\n` +
+      top.map((c,i)=>`${i+1}. ${c.nickname} — 메시지 ${c.msgCount} / 리액션 ${c.reactCount}`).join('\n'));
+    await setDoc(ref, {
+      weekId:curWeek, statsWeek,
+      top3: top.map(c=>({ uid:c.uid, nickname:c.nickname, score:c.score })),
+      pollChannelId: BOT_CHANNEL_ID, pollMsgId: msgRef.id,
+      tallyDone:false, createdAt: serverTimestamp()
+    });
+  }catch(e){ console.error('mvp poll create error', e); }
+}
+async function tallyAndAnnounceMvp(weekId, state){
+  try{
+    const mref=doc(db,'channels',state.pollChannelId,'messages',state.pollMsgId);
+    const msnap=await getDoc(mref);
+    if(!msnap.exists()){ await updateDoc(doc(db,'mvp_weeks',weekId), { tallyDone:true }); return; }
+    const options = msnap.data().options||[];
+    let bestIdx=0, bestVotes=-1;
+    options.forEach((o,i)=>{ const v=(o.votes||[]).length; if(v>bestVotes){ bestVotes=v; bestIdx=i; } });
+    const winner = (state.top3||[])[bestIdx];
+    if(winner){
+      await sendBotMessage(state.pollChannelId,
+        `🏆🎉 이번 주 MVP는 ${winner.nickname}님입니다! (${bestVotes}표) 축하해요! 👏\n` +
+        options.map((o,i)=>`${i+1}. ${o.text} — ${(o.votes||[]).length}표`).join('\n'));
+      await updateDoc(doc(db,'mvp_weeks',weekId), { tallyDone:true, winnerUid:winner.uid, winnerNickname:winner.nickname, announcedAt: serverTimestamp() });
+    } else {
+      await updateDoc(doc(db,'mvp_weeks',weekId), { tallyDone:true });
+    }
+  }catch(e){ console.error('mvp tally error', e); }
+}
+let mvpCycleChecked=false;
+async function checkWeeklyMvpCycle(){
+  if(mvpCycleChecked) return;
+  if(!myDoc || !currentUser) return;
+  mvpCycleChecked=true;
+  try{
+    const curWeek = weekIdOf(new Date());
+    const prevWeek = prevWeekId(curWeek);
+    const prevRef = doc(db,'mvp_weeks',prevWeek);
+    const prevSnap = await getDoc(prevRef);
+    if(prevSnap.exists()){
+      const st=prevSnap.data();
+      if(!st.tallyDone && !st.skipped && st.pollMsgId) await tallyAndAnnounceMvp(prevWeek, st);
+    }
+    const curRef = doc(db,'mvp_weeks',curWeek);
+    const curSnap = await getDoc(curRef);
+    if(!curSnap.exists()) await createWeeklyMvpPoll(curWeek, prevWeek);
+  }catch(e){ console.error('mvp cycle error', e); }
+}
+async function showCurrentRanking(){
+  const wk=weekIdOf(new Date());
+  const ranking = await computeRanking(wk);
+  if(!ranking.length){ postBotReply('📊 이번 주는 아직 집계된 활동이 없어요.'); return; }
+  const top=ranking.slice(0,5);
+  postBotReply(`📊 이번 주 채팅 활동 랭킹 (진행 중 · 관리자 제외)\n` +
+    top.map((c,i)=>`${i+1}. ${c.nickname} — ${c.score}점 (메시지 ${c.msgCount} / 리액션 ${c.reactCount})`).join('\n'));
+}
+
 function toggleBotMode(){
   if(!canUseAdminCommands()){ toast('관리자(팀장/선생님)만 봇 모드를 사용할 수 있어요.'); return; }
   botModeOn=!botModeOn;
@@ -1679,6 +1806,10 @@ async function handleSlashCommand(raw){
         if(!ddayTarget){ postBotReply('📅 아직 대회 날짜가 설정되지 않았어요.'); return; }
         const diff=Math.ceil((new Date(ddayTarget)-new Date(new Date().toDateString()))/86400000);
         postBotReply(diff>=0 ? `📅 대회까지 D-${diff} 남았어요!` : `📅 대회일이 ${Math.abs(diff)}일 지났어요.`);
+        return;
+      }
+      case '/순위': case '/ranking': {
+        await showCurrentRanking();
         return;
       }
       case '/공지': {
