@@ -869,7 +869,7 @@ $('signupBtn').onclick = async ()=>{
       email, nickname: nick, photoURL:'', roles: isAdmin? ['leader']:['member'],
       isAdmin, createdAt: serverTimestamp(), lastSeen: serverTimestamp()
     });
-    sendBotMessage(BOT_CHANNEL_ID, `👋 ${nick}님이 오셨어요! ROBOFEST 팀에 오신 걸 환영합니다 🎉`);
+    sendBotMessage(BOT_CHANNEL_ID, `👋 ${nick}님이 오셨어요! ROBOFEST 팀에 오신 걸 환영합니다 🎉`, cred.user.uid);
     toast('회원가입이 완료되었습니다.');
   }catch(e){ showMsg('signupMsg', translateAuthErr(e)); }
   $('signupBtn').disabled=false;
@@ -917,7 +917,7 @@ onAuthStateChanged(auth, async (user)=>{
       const isAdmin = user.email.toLowerCase()===ADMIN_EMAIL;
       await setDoc(uref, { email:user.email, nickname:user.displayName||user.email.split('@')[0], photoURL:'', roles:isAdmin?['leader']:['member'], isAdmin, createdAt:serverTimestamp(), lastSeen:serverTimestamp() });
       snap=await getDoc(uref);
-      sendBotMessage(BOT_CHANNEL_ID, `👋 ${user.displayName||user.email.split('@')[0]}님이 오셨어요! ROBOFEST 팀에 오신 걸 환영합니다 🎉`);
+      sendBotMessage(BOT_CHANNEL_ID, `👋 ${user.displayName||user.email.split('@')[0]}님이 오셨어요! ROBOFEST 팀에 오신 걸 환영합니다 🎉`, user.uid);
     }
     myDoc = snap.data();
     if(myDoc.disabled){
@@ -1372,10 +1372,11 @@ async function exportChannelChat(){
   }catch(e){ console.error(e); toast('내보내기 중 오류가 발생했습니다.'); }
 }
 function renderMessage(id, m){
-  const u = usersMap[m.userId] || {};
+  const asBot = !!m.isBot;
+  const u = asBot ? BOT_USER : (usersMap[m.userId] || {});
   const roleColor = primaryRoleColor(u.roles);
   const roleTxt = rolesLabel(u.roles);
-  const mine = m.userId===currentUser.uid || (m.realUserId && m.realUserId===currentUser.uid);
+  const mine = m.userId===currentUser.uid;
   const row=document.createElement('div');
   row.className='msg-row'; row.dataset.id=id;
   let replyHtml='';
@@ -1522,8 +1523,7 @@ async function sendMessage(){
     createdAt: serverTimestamp()
   };
   if(botModeOn && canUseAdminCommands()){
-    payload.realUserId = currentUser.uid;
-    payload.userId = 'BOT';
+    payload.isBot = true;
   }
   if(replyTarget) payload.replyTo = replyTarget;
   if(pendingAttachments.length) payload.attachments = pendingAttachments.slice();
@@ -1541,9 +1541,11 @@ function canUseAdminCommands(){
   if(!myDoc) return false;
   return !!myDoc.isAdmin || (myDoc.roles||[]).includes('leader') || (myDoc.roles||[]).includes('teacher');
 }
-async function sendBotMessage(channelId, content){
+async function sendBotMessage(channelId, content, actingUid){
+  const uid = actingUid || (currentUser && currentUser.uid);
+  if(!uid) return;
   try{
-    await addDoc(collection(db,'channels',channelId,'messages'), { userId:'BOT', content, createdAt: serverTimestamp() });
+    await addDoc(collection(db,'channels',channelId,'messages'), { userId:uid, isBot:true, content, createdAt: serverTimestamp() });
     updateDoc(doc(db,'channels',channelId), { lastMessageAt: serverTimestamp() }).catch(()=>{});
   }catch(e){ console.error('bot message error', e); }
 }
