@@ -284,6 +284,9 @@
     border-radius:8px; width:220px; max-height:220px; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,.4); z-index:20;
   }
   #slashPop{width:280px;}
+  #channelPop{width:240px;}
+  .msg-text .mention.chan-mention{cursor:pointer;}
+  .msg-text .mention.chan-mention:hover{text-decoration:underline;}
   .mention-item{padding:8px 10px; font-size:12.5px; display:flex; align-items:center; gap:8px; cursor:pointer;}
   .mention-item.slash-item{flex-direction:column; align-items:flex-start; gap:2px;}
   .mention-item:hover, .mention-item.sel{background:var(--blue-glow);}
@@ -639,11 +642,12 @@
         <div class="attach-preview-strip hidden" id="attachPreview"></div>
         <div class="composer" style="position:relative;">
           <div class="mention-pop hidden" id="mentionPop"></div>
+          <div class="mention-pop hidden" id="channelPop"></div>
           <div class="mention-pop hidden" id="slashPop"></div>
           <button class="img-btn" id="imgBtn" title="이미지 첨부 (URL)">🖼</button>
           <button class="file-btn" id="fileBtn" title="파일 목록 첨부 (URL)">📎</button>
           <button class="poll-btn" id="pollBtn" title="투표 만들기">📊</button>
-          <textarea id="msgInput" rows="1" placeholder="메시지 보내기... (@ 로 멘션)"></textarea>
+          <textarea id="msgInput" rows="1" placeholder="메시지 보내기... (@ 멘션, # 채널)"></textarea>
           <button class="send-btn" id="sendBtn" disabled>➤</button>
         </div>
       </div>
@@ -832,6 +836,13 @@ function renderMentions(text){
       if(!u.nickname) return;
       const re = new RegExp('@'+u.nickname.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'g');
       seg = seg.replace(re, `<span class="mention">@${escapeHtml(u.nickname)}</span>`);
+    });
+    // 채널 참조(#채널명) -> 클릭하면 해당 채널로 이동하는 파란 태그로 표시
+    channels.slice().sort((a,b)=>(b.name||'').length-(a.name||'').length).forEach(c=>{
+      if(!c.name) return;
+      const nameEsc = escapeHtml(c.name).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      const re = new RegExp('#'+nameEsc+'(?![\\p{L}\\p{N}_-])', 'gu');
+      seg = seg.replace(re, `<span class="mention chan-mention" data-chan="${c.id}">#${escapeHtml(c.name)}</span>`);
     });
     return linkify(seg);
   }).join('');
@@ -1434,6 +1445,15 @@ function renderMessage(id, m){
   const pinBtn=row.querySelector('[data-act="pin"]');
   if(pinBtn) pinBtn.onclick=()=>updateDoc(doc(db,'channels',currentChannelId,'messages',id), { pinned: !m.pinned });
   row.querySelector('[data-act="react"]').onclick=(e)=>openReactionPicker(e.currentTarget, id);
+  row.querySelectorAll('.chan-mention').forEach(el=>{
+    el.onclick=(e)=>{
+      e.stopPropagation();
+      const ch=channels.find(c=>c.id===el.getAttribute('data-chan'));
+      if(!ch) return;
+      const cat=categories.find(c=>c.id===ch.categoryId);
+      openChannel(ch.id, ch.name, cat?cat.name:'');
+    };
+  });
   renderReactions(row.querySelector('[data-reactions]'), id, m.reactions||{});
   if(isPoll){
     row.querySelectorAll('[data-optidx]').forEach(el=>el.onclick=()=>votePoll(id, parseInt(el.getAttribute('data-optidx'),10)));
@@ -1512,6 +1532,7 @@ msgInput.addEventListener('input', ()=>{
   msgInput.style.height='auto'; msgInput.style.height=Math.min(msgInput.scrollHeight,140)+'px';
   $('sendBtn').disabled = !msgInput.value.trim() && !pendingAttachments.length;
   handleMentionPopup();
+  handleChannelPopup();
   handleSlashPopup();
   handleTyping();
 });
@@ -1903,8 +1924,30 @@ function handleMentionPopup(){
   });
 }
 document.addEventListener('click',(e)=>{
-  if(!e.target.closest('.composer')){ $('mentionPop').classList.add('hidden'); $('slashPop').classList.add('hidden'); }
+  if(!e.target.closest('.composer')){ $('mentionPop').classList.add('hidden'); $('channelPop').classList.add('hidden'); $('slashPop').classList.add('hidden'); }
 });
+
+/* channel-reference autocomplete popup: '#'를 입력하면 볼 수 있는 채널 목록을 보여줌 */
+function handleChannelPopup(){
+  const val=msgInput.value;
+  const caret=msgInput.selectionStart;
+  const upto=val.slice(0,caret);
+  const m=upto.match(/#([^\s#]*)$/);
+  const pop=$('channelPop');
+  if(!m){ pop.classList.add('hidden'); return; }
+  const term=m[1].toLowerCase();
+  const opts = channels.filter(c=>c.name && canSeeChannel(c) && c.name.toLowerCase().includes(term))
+    .sort((a,b)=>(a.position||0)-(b.position||0)).slice(0,8);
+  if(!opts.length){ pop.classList.add('hidden'); return; }
+  pop.innerHTML = opts.map(c=>`<div class="mention-item" data-cv="${escapeHtml(c.name)}"><span class="hash" style="color:var(--blue);">#</span> ${escapeHtml(c.name)}</div>`).join('');
+  pop.classList.remove('hidden');
+  pop.querySelectorAll('[data-cv]').forEach(el=>el.onclick=()=>{
+    const name=el.getAttribute('data-cv');
+    msgInput.value = upto.replace(/#([^\s#]*)$/, '#'+name+' ') + val.slice(caret);
+    pop.classList.add('hidden'); msgInput.focus();
+    $('sendBtn').disabled = !msgInput.value.trim() && !pendingAttachments.length;
+  });
+}
 
 /* slash-command autocomplete popup: 메시지 맨 앞에 '/'를 입력하면 사용 가능한 명령어를 보여줌 */
 function handleSlashPopup(){
