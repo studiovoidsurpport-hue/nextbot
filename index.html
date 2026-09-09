@@ -2,7 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0c0d0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>NEXTBOT | ROBOFEST 2027</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -33,6 +37,10 @@
     --radius-sm:6px;
     --font-ui:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
     --font-display:'Space Grotesk',var(--font-ui);
+    --safe-t:env(safe-area-inset-top,0px);
+    --safe-b:env(safe-area-inset-bottom,0px);
+    --safe-l:env(safe-area-inset-left,0px);
+    --safe-r:env(safe-area-inset-right,0px);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{height:100%;}
@@ -452,23 +460,63 @@
 
   /* responsive */
   .drawer-scrim{display:none;}
+  .member-scrim{display:none;}
   @media (max-width:880px){
     .member-panel{display:none;}
     .member-panel.popup{
       display:block; position:fixed; right:0; top:0; bottom:0; z-index:80; box-shadow:-10px 0 30px rgba(0,0,0,.5);
+      width:min(82vw,320px); padding-top:calc(16px + var(--safe-t)); padding-bottom:calc(16px + var(--safe-b));
+      animation:slideInPanel .18s ease;
     }
+    .member-scrim.show{display:block; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:79;}
+    @keyframes slideInPanel{ from{transform:translateX(100%);} to{transform:translateX(0);} }
     .sidebar{
       position:fixed; left:0; top:0; bottom:0; z-index:90; transform:translateX(-100%); transition:transform .2s ease;
-      box-shadow:10px 0 30px rgba(0,0,0,.5);
+      box-shadow:10px 0 30px rgba(0,0,0,.5); width:min(84vw,280px);
+      padding-top:var(--safe-t); padding-left:var(--safe-l);
     }
     .sidebar.open{transform:translateX(0);}
     .drawer-toggle{display:flex;}
     .drawer-scrim.show{display:block; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:85;}
-    .dash{padding:18px 16px 50px;}
+    .dash{padding:16px 14px 50px;}
     .dash-grid{grid-template-columns:1fr;}
-    .dash-hero{padding:20px;}
+    .dash-hero{padding:18px; flex-direction:column; align-items:flex-start;}
+    .dday-box{text-align:left;}
     .dday-num{font-size:32px;}
-    .modal{max-width:100%;}
+    .modal{max-width:100%; max-height:calc(90vh - var(--safe-b));}
+    .modal-bg{align-items:flex-end; padding:0;}
+    .modal{border-radius:16px 16px 0 0; width:100%; padding-bottom:calc(22px + var(--safe-b));}
+
+    .topbar{ padding:0 10px; padding-top:var(--safe-t); height:calc(52px + var(--safe-t)); gap:6px; }
+    .search-box{ width:auto; flex:1; margin-left:6px; }
+    .chan-title{ font-size:13.5px; }
+    .icon-btn{ width:38px; height:38px; font-size:16px; }
+
+    .msg-list{ padding:10px 12px 6px; }
+    .msg-row{ padding:8px 6px; gap:8px; }
+    .msg-actions{ display:none; position:static; margin-top:6px; background:none; border:none; gap:4px; }
+    .msg-row.touch-open .msg-actions{ display:flex; }
+    .msg-actions button{ background:var(--panel-2); border:1px solid var(--border-soft); border-radius:6px; padding:7px 10px; }
+    .composer-wrap{ padding:0 10px calc(12px + var(--safe-b)); }
+    .composer textarea, .field input, textarea.field-ta{ font-size:16px; }
+    .composer .send-btn, .composer .poll-btn, .composer .img-btn, .composer .file-btn{ width:38px; height:38px; }
+
+    .cal-wrap{ padding:16px 12px 40px; }
+    .cal-cell{ min-height:58px; padding:4px; }
+    .cal-evt{ font-size:9px; }
+
+    .admin-tabs{ overflow-x:auto; }
+    .feature-toolbar{ flex-wrap:wrap; padding:12px 14px 0; }
+    .feature-list{ padding:12px 14px 30px; }
+  }
+  @media (max-width:420px){
+    .dday-num{font-size:28px;}
+    .search-box{ display:none !important; }
+    .auth-box{ max-width:100%; }
+  }
+  /* iOS: avoid input auto-zoom by keeping form fields >=16px on touch */
+  @media (pointer:coarse){
+    .field input, textarea.field-ta, .composer textarea{ font-size:16px; }
   }
 </style>
 </head>
@@ -512,6 +560,7 @@
 <!-- ============ APP VIEW ============ -->
 <div id="appView">
   <div class="drawer-scrim" id="drawerScrim"></div>
+  <div class="member-scrim" id="memberScrim"></div>
 
   <aside class="sidebar" id="sidebar">
     <div class="sb-brand">
@@ -831,6 +880,11 @@ onAuthStateChanged(auth, async (user)=>{
       snap=await getDoc(uref);
     }
     myDoc = snap.data();
+    if(myDoc.disabled){
+      await signOut(auth);
+      showMsg('loginMsg','관리자에 의해 비활성화된 계정입니다.');
+      return;
+    }
     enterApp();
   } else {
     currentUser=null; myDoc=null;
@@ -926,6 +980,11 @@ function listenUsers(){
     usersMap={};
     snap.forEach(d=>{ usersMap[d.id]={ uid:d.id, ...d.data() }; });
     if(myDoc && usersMap[currentUser.uid]) myDoc = usersMap[currentUser.uid];
+    if(myDoc && myDoc.disabled){
+      toast('관리자에 의해 계정이 비활성화되었습니다.');
+      signOut(auth);
+      return;
+    }
     renderMemberPanel();
     renderPresence(presenceData);
   });
@@ -952,9 +1011,13 @@ function renderMemberPanel(){
 }
 $('memberBtn').onclick=()=>{
   const mp=$('memberPanel');
-  if(window.innerWidth<=880){ mp.classList.toggle('popup'); }
+  if(window.innerWidth<=880){
+    const open=mp.classList.toggle('popup');
+    $('memberScrim').classList.toggle('show', open);
+  }
   else { mp.style.display = mp.style.display==='none' ? '' : 'none'; }
 };
+$('memberScrim').onclick=()=>{ $('memberPanel').classList.remove('popup'); $('memberScrim').classList.remove('show'); };
 
 /* ---------------- Structure (categories/channels) ---------------- */
 function listenStructure(){
@@ -1003,6 +1066,7 @@ function renderSidebarChannels(){
       <div class="sb-chan-list ${collapsed?'collapsed':''}">
         ${chans.map(ch=>`<div class="sb-chan ${ch.id===currentChannelId?'active':''}" data-chan="${ch.id}" data-catname="${escapeHtml(cat.name)}">
             <span class="hash">#</span><span>${escapeHtml(ch.name)}</span>
+            <span class="unread-dot ${channelHasUnread(ch)?'on':''}"></span>
             ${myDoc.isAdmin?`<span class="chan-perm" data-permchan="${ch.id}" title="접근 권한">⚙</span><span class="del-x" data-delchan="${ch.id}">✕</span>`:''}
           </div>`).join('')}
         ${myDoc.isAdmin?`<div class="sb-add-chan" data-addchan="${cat.id}">+ 채널 추가</div>`:''}
@@ -1126,10 +1190,25 @@ function openChannel(chanId, chanName, catName){
   }
 }
 
+/* ---------------- Read state (unread dots) ---------------- */
+function markChannelRead(chanId){
+  if(!currentUser) return;
+  updateDoc(doc(db,'users',currentUser.uid), { [`readState.${chanId}`]: Date.now() }).catch(()=>{});
+  if(myDoc){ myDoc.readState = myDoc.readState||{}; myDoc.readState[chanId]=Date.now(); }
+}
+function channelHasUnread(ch){
+  if(!myDoc || ch.id===currentChannelId) return false;
+  if(!ch.lastMessageAt) return false;
+  const lastMsg = ch.lastMessageAt.toMillis ? ch.lastMessageAt.toMillis() : (ch.lastMessageAt.seconds? ch.lastMessageAt.seconds*1000 : 0);
+  const readAt = (myDoc.readState && myDoc.readState[ch.id]) || 0;
+  return lastMsg > readAt;
+}
+
 /* ---------------- Chat ---------------- */
 function openChatChannel(chanId){
   if(msgUnsub) msgUnsub();
   if(typingUnsub) typingUnsub();
+  markChannelRead(chanId);
   replyTarget=null; renderReplyPreview();
   pendingAttachments=[]; renderAttachPreview();
   closeSearch();
@@ -1280,6 +1359,14 @@ function renderMessage(id, m){
   if(isPoll){
     row.querySelectorAll('[data-optidx]').forEach(el=>el.onclick=()=>votePoll(id, parseInt(el.getAttribute('data-optidx'),10)));
   }
+  // touch devices have no hover — tap the row background to reveal actions
+  row.addEventListener('click',(e)=>{
+    if(window.innerWidth>880) return;
+    if(e.target.closest('a,button,.poll-opt,.reaction-chip,.reaction-add')) return;
+    const wasOpen=row.classList.contains('touch-open');
+    document.querySelectorAll('.msg-row.touch-open').forEach(r=>r.classList.remove('touch-open'));
+    if(!wasOpen) row.classList.add('touch-open');
+  });
   $('msgList').appendChild(row);
 }
 function renderReactions(box, msgId, reactions){
@@ -1364,6 +1451,7 @@ async function sendMessage(){
   if(replyTarget) payload.replyTo = replyTarget;
   if(pendingAttachments.length) payload.attachments = pendingAttachments.slice();
   await addDoc(collection(db,'channels',currentChannelId,'messages'), payload);
+  updateDoc(doc(db,'channels',currentChannelId), { lastMessageAt: serverTimestamp() }).catch(()=>{});
   pushMentionNotifications(payload.mentions, text);
   msgInput.value=''; msgInput.style.height='auto';
   replyTarget=null; renderReplyPreview();
@@ -1911,24 +1999,12 @@ function openAdminModal(){
 function renderAdminTab(tab){
   const body=$('adminBody');
   if(tab==='users'){
-    body.innerHTML = Object.values(usersMap).map(u=>`
-      <div class="admin-userrow">
-        ${avatarHtml(u,30)}
-        <div class="nm"><div class="n">${escapeHtml(u.nickname)} ${u.isAdmin?'👑':''}</div><div class="e">${escapeHtml(u.email)}</div></div>
-      </div>
-      <div class="chip-select" style="margin-bottom:14px;" data-uid="${u.uid}">
-        ${Object.entries(ROLE_DEFS).map(([k,v])=>`<div class="chip-opt ${((u.roles||[]).includes(k))?'on':''}" data-role="${k}">${v.label}</div>`).join('')}
-      </div>
-    `).join('');
-    body.querySelectorAll('.chip-select').forEach(box=>{
-      box.querySelectorAll('.chip-opt').forEach(chip=>chip.onclick=async ()=>{
-        const uid=box.getAttribute('data-uid'); const role=chip.getAttribute('data-role');
-        const u=usersMap[uid]; let roles=new Set(u.roles||[]);
-        if(roles.has(role)) roles.delete(role); else roles.add(role);
-        if(roles.size===0) roles.add('member');
-        await updateDoc(doc(db,'users',uid), { roles:Array.from(roles) });
-      });
-    });
+    body.innerHTML = `
+      <div class="field" style="margin-bottom:12px;"><input type="text" id="adminUserSearch" placeholder="닉네임 또는 이메일로 검색..." style="width:100%; background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:9px 11px; font-size:13px; color:var(--text);"></div>
+      <div id="adminUserList"></div>
+    `;
+    renderAdminUserList('');
+    $('adminUserSearch').addEventListener('input', (e)=>renderAdminUserList(e.target.value.trim().toLowerCase()));
   } else if(tab==='announce'){
     body.innerHTML=`
       <div class="field"><label>공지 제목</label><input type="text" id="anTitle"></div>
@@ -1953,6 +2029,91 @@ function renderAdminTab(tab){
       $('evTitle').value=''; $('evDate').value=''; toast('일정이 추가되었습니다.');
     };
   }
+}
+
+function renderAdminUserList(term){
+  const box=$('adminUserList');
+  if(!box) return;
+  const list = Object.values(usersMap).filter(u=>{
+    if(!term) return true;
+    return (u.nickname||'').toLowerCase().includes(term) || (u.email||'').toLowerCase().includes(term);
+  }).sort((a,b)=>(a.nickname||'').localeCompare(b.nickname||''));
+  if(!list.length){ box.innerHTML='<div class="empty" style="padding:10px 0;">일치하는 사용자가 없습니다</div>'; return; }
+  box.innerHTML = list.map(u=>`
+    <div class="admin-userrow">
+      ${avatarHtml(u,30)}
+      <div class="nm">
+        <div class="n">${escapeHtml(u.nickname)} ${u.isAdmin?'👑':''} ${u.disabled?'<span class="pill fail">비활성화됨</span>':''}</div>
+        <div class="e">${escapeHtml(u.email)}</div>
+      </div>
+      <button class="btn btn-sm" data-manage="${u.uid}">계정 관리</button>
+    </div>
+  `).join('');
+  box.querySelectorAll('[data-manage]').forEach(btn=>btn.onclick=()=>openUserManageModal(btn.getAttribute('data-manage')));
+}
+
+function openUserManageModal(uid){
+  const u = usersMap[uid];
+  if(!u) return;
+  openModal(`
+    <h3>계정 관리 — ${escapeHtml(u.nickname||'')}</h3>
+
+    <div class="field"><label>닉네임 (강제 변경)</label><input type="text" id="mgNick" value="${escapeHtml(u.nickname||'')}"></div>
+
+    <div class="field">
+      <label>직급 (강제 변경) — 여러 개 선택 가능</label>
+      <div class="chip-select" id="mgRoleChips">
+        ${Object.entries(ROLE_DEFS).map(([k,v])=>`<div class="chip-opt ${((u.roles||[]).includes(k))?'on':''}" data-role="${k}">${v.label}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="field"><label>연락용 이메일 (표시용 — 로그인 이메일과 별개)</label><input type="text" id="mgContactEmail" value="${escapeHtml(u.contactEmail||'')}" placeholder="예: parent@example.com"></div>
+
+    <div class="field" style="background:var(--panel-2); border:1px solid var(--border-soft); border-radius:8px; padding:10px 12px; font-size:11.5px; color:var(--text-faint); line-height:1.6;">
+      🔒 로그인 이메일(<b style="color:var(--text-dim);">${escapeHtml(u.email||'')}</b>)과 비밀번호는 보안상 Firebase 클라이언트에서 관리자가 직접 바꿀 수 없습니다.
+      아래 버튼으로 <b style="color:var(--text-dim);">비밀번호 재설정 메일</b>을 보내면, 본인이 메일의 링크로 새 비밀번호를 설정할 수 있어요.
+    </div>
+    <button class="btn btn-sm" id="mgResetPw" style="width:100%; margin-bottom:14px;">📧 비밀번호 재설정 메일 발송</button>
+
+    <div class="field">
+      <label>계정 상태</label>
+      <div class="chip-select">
+        <div class="chip-opt ${!u.disabled?'on':''}" id="mgEnable">활성화</div>
+        <div class="chip-opt ${u.disabled?'on':''}" id="mgDisable" style="${u.disabled?'border-color:var(--danger); color:var(--danger); background:rgba(255,92,92,.1);':''}">비활성화 (로그인 차단)</div>
+      </div>
+    </div>
+
+    <div class="modal-actions"><button class="btn" id="mgCancel">취소</button><button class="btn btn-primary" id="mgSave" style="width:auto;">저장</button></div>
+  `, true);
+
+  const roleSel = new Set(u.roles||[]);
+  document.querySelectorAll('#mgRoleChips .chip-opt').forEach(chip=>chip.onclick=()=>{
+    const r=chip.getAttribute('data-role');
+    if(roleSel.has(r)){ roleSel.delete(r); chip.classList.remove('on'); } else { roleSel.add(r); chip.classList.add('on'); }
+  });
+
+  let disabledState = !!u.disabled;
+  $('mgEnable').onclick=()=>{ disabledState=false; $('mgEnable').classList.add('on'); $('mgDisable').classList.remove('on'); $('mgDisable').style=''; };
+  $('mgDisable').onclick=()=>{ disabledState=true; $('mgDisable').classList.add('on'); $('mgDisable').style='border-color:var(--danger); color:var(--danger); background:rgba(255,92,92,.1);'; $('mgEnable').classList.remove('on'); };
+
+  $('mgResetPw').onclick=async ()=>{
+    if(!u.email){ toast('이 계정에 등록된 이메일이 없습니다.'); return; }
+    try{ await sendPasswordResetEmail(auth, u.email); toast(`${u.email} 로 재설정 메일을 보냈습니다.`); }
+    catch(e){ toast('메일 발송 실패: '+translateAuthErr(e)); }
+  };
+
+  $('mgCancel').onclick=closeModal;
+  $('mgSave').onclick=async ()=>{
+    const nick=$('mgNick').value.trim();
+    const contactEmail=$('mgContactEmail').value.trim();
+    if(!nick){ toast('닉네임을 입력해주세요.'); return; }
+    let roles = Array.from(roleSel); if(!roles.length) roles=['member'];
+    try{
+      await updateDoc(doc(db,'users',uid), { nickname:nick, roles, contactEmail, disabled: disabledState });
+      toast('계정 정보가 저장되었습니다.');
+      closeModal();
+    }catch(e){ toast('저장 실패: '+e.message); }
+  };
 }
 
 /* ---------------- Modal helper ---------------- */
