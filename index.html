@@ -283,7 +283,9 @@
     position:absolute; bottom:100%; left:20px; margin-bottom:6px; background:var(--card); border:1px solid var(--border);
     border-radius:8px; width:220px; max-height:220px; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,.4); z-index:20;
   }
+  #slashPop{width:280px;}
   .mention-item{padding:8px 10px; font-size:12.5px; display:flex; align-items:center; gap:8px; cursor:pointer;}
+  .mention-item.slash-item{flex-direction:column; align-items:flex-start; gap:2px;}
   .mention-item:hover, .mention-item.sel{background:var(--blue-glow);}
   .empty-chan{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-faint); gap:6px;}
   .empty-chan .big{font-size:30px;}
@@ -637,6 +639,7 @@
         <div class="attach-preview-strip hidden" id="attachPreview"></div>
         <div class="composer" style="position:relative;">
           <div class="mention-pop hidden" id="mentionPop"></div>
+          <div class="mention-pop hidden" id="slashPop"></div>
           <button class="img-btn" id="imgBtn" title="이미지 첨부 (URL)">🖼</button>
           <button class="file-btn" id="fileBtn" title="파일 목록 첨부 (URL)">📎</button>
           <button class="poll-btn" id="pollBtn" title="투표 만들기">📊</button>
@@ -696,7 +699,8 @@ const firebaseConfig = {
   projectId: "robofest-nextbot",
   storageBucket: "robofest-nextbot.firebasestorage.app",
   messagingSenderId: "770591063404",
-  appId: "1:770591063404:web:28a2494ba096443c8c0749"
+  appId: "1:770591063404:web:28a2494ba096443c8c0749",
+  databaseURL: "https://robofest-nextbot-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1073,6 +1077,7 @@ function listenStructure(){
   });
   onSnapshot(collection(db,'channels'), (snap)=>{
     channels = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    ensureBotChannelExists();
     renderSidebarChannels();
     // if an admin restricts the channel we're currently viewing, kick non-permitted users out
     if(currentChannelId && !myDoc.isAdmin){
@@ -1095,15 +1100,22 @@ async function seedDefaultStructure(){
     }
   }catch(e){ console.error('seed error', e); }
 }
-let botChannelEnsureTried=false;
+let botChannelEnsureInFlight=false;
 async function ensureBotChannelExists(){
-  if(botChannelEnsureTried) return;
-  if(categories.some(c=>c.id===BOT_CAT_ID)) return;
-  botChannelEnsureTried=true;
+  if(botChannelEnsureInFlight) return;
+  // 카테고리와 채널 문서가 둘 다 있어야 정상 상태. 하나라도 없으면 재시도한다.
+  const catExists = categories.some(c=>c.id===BOT_CAT_ID);
+  const chanExists = channels.some(c=>c.id===BOT_CHANNEL_ID);
+  if(catExists && chanExists) return;
+  // 카테고리/채널 생성은 규칙상 isAdmin()만 가능하므로, 관리자가 아니면 시도조차 하지 않는다
+  // (팀장/선생님 계정에서 매번 permission-denied가 콘솔에 찍히는 것을 방지)
+  if(!myDoc || !myDoc.isAdmin) return;
+  botChannelEnsureInFlight=true;
   try{
-    await setDoc(doc(db,'categories',BOT_CAT_ID), { name:"🤖 BOT", position: categories.length });
-    await setDoc(doc(db,'channels',BOT_CHANNEL_ID), { categoryId:BOT_CAT_ID, name:"봇-알림", position:0, allowedRoles:[] });
+    if(!catExists) await setDoc(doc(db,'categories',BOT_CAT_ID), { name:"🤖 BOT", position: categories.length });
+    if(!chanExists) await setDoc(doc(db,'channels',BOT_CHANNEL_ID), { categoryId:BOT_CAT_ID, name:"봇-알림", position:0, allowedRoles:[] });
   }catch(e){ console.error('bot channel ensure error', e); }
+  botChannelEnsureInFlight=false;
 }
 let collapsedCats = {};
 function renderSidebarChannels(){
@@ -1500,6 +1512,7 @@ msgInput.addEventListener('input', ()=>{
   msgInput.style.height='auto'; msgInput.style.height=Math.min(msgInput.scrollHeight,140)+'px';
   $('sendBtn').disabled = !msgInput.value.trim() && !pendingAttachments.length;
   handleMentionPopup();
+  handleSlashPopup();
   handleTyping();
 });
 msgInput.addEventListener('keydown',(e)=>{
@@ -1527,12 +1540,18 @@ async function sendMessage(){
   }
   if(replyTarget) payload.replyTo = replyTarget;
   if(pendingAttachments.length) payload.attachments = pendingAttachments.slice();
-  await addDoc(collection(db,'channels',currentChannelId,'messages'), payload);
-  updateDoc(doc(db,'channels',currentChannelId), { lastMessageAt: serverTimestamp() }).catch(()=>{});
-  pushMentionNotifications(payload.mentions, text);
-  msgInput.value=''; msgInput.style.height='auto';
-  replyTarget=null; renderReplyPreview();
-  pendingAttachments=[]; renderAttachPreview();
+  try{
+    await addDoc(collection(db,'channels',currentChannelId,'messages'), payload);
+    updateDoc(doc(db,'channels',currentChannelId), { lastMessageAt: serverTimestamp() }).catch(()=>{});
+    pushMentionNotifications(payload.mentions, text);
+    msgInput.value=''; msgInput.style.height='auto';
+    replyTarget=null; renderReplyPreview();
+    pendingAttachments=[]; renderAttachPreview();
+  }catch(e){
+    console.error('send message error', e);
+    toast(e && e.code==='permission-denied' ? '이 채널에 메시지를 보낼 권한이 없어요. (채널 설정을 확인해주세요)' : '메시지 전송에 실패했어요. 다시 시도해주세요.');
+    $('sendBtn').disabled = !msgInput.value.trim() && !pendingAttachments.length;
+  }
   setTypingState(false);
 }
 
@@ -1883,7 +1902,37 @@ function handleMentionPopup(){
     pop.classList.add('hidden'); msgInput.focus();
   });
 }
-document.addEventListener('click',(e)=>{ if(!e.target.closest('.composer')) $('mentionPop').classList.add('hidden'); });
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('.composer')){ $('mentionPop').classList.add('hidden'); $('slashPop').classList.add('hidden'); }
+});
+
+/* slash-command autocomplete popup: 메시지 맨 앞에 '/'를 입력하면 사용 가능한 명령어를 보여줌 */
+function handleSlashPopup(){
+  const val=msgInput.value;
+  const pop=$('slashPop');
+  const m=val.match(/^\/(\S*)$/); // '/' 로 시작하고 아직 공백(인자) 없이 명령어를 입력 중일 때만
+  if(!m){ pop.classList.add('hidden'); return; }
+  const term=m[1].toLowerCase();
+  const list=HELP_COMMANDS.concat(canUseAdminCommands() ? HELP_ADMIN_COMMANDS : []);
+  const filtered = term ? list.filter(c=>c.cmd.toLowerCase().includes(term)) : list;
+  if(!filtered.length){ pop.classList.add('hidden'); return; }
+  pop.innerHTML = filtered.map(c=>{
+    const word = c.cmd.split(/\s/)[0];
+    return `<div class="mention-item slash-item" data-sv="${escapeHtml(word)}">
+      <span style="font-family:'SFMono-Regular',Consolas,monospace; color:var(--blue);">${escapeHtml(c.cmd)}</span>
+      <span style="color:var(--text-faint); font-size:11px;">${escapeHtml(c.desc)}</span>
+    </div>`;
+  }).join('');
+  pop.classList.remove('hidden');
+  pop.querySelectorAll('[data-sv]').forEach(el=>el.onclick=()=>{
+    const word=el.getAttribute('data-sv');
+    msgInput.value = word + ' ';
+    msgInput.style.height='auto'; msgInput.style.height=Math.min(msgInput.scrollHeight,140)+'px';
+    $('sendBtn').disabled = !msgInput.value.trim() && !pendingAttachments.length;
+    pop.classList.add('hidden');
+    msgInput.focus();
+  });
+}
 
 function handleTyping(){
   setTypingState(true);
