@@ -524,6 +524,42 @@
   @media (pointer:coarse){
     .field input, textarea.field-ta, .composer textarea{ font-size:16px; }
   }
+
+
+  /* ---------- NEXTBOT Mega Pack: UX extras ---------- */
+  #jumpBottomBtn{
+    position:fixed; right:22px; bottom:76px; z-index:70; width:38px; height:38px;
+    border-radius:50%; border:1px solid var(--border); background:var(--card); color:var(--text);
+    box-shadow:0 8px 24px rgba(0,0,0,.35); display:none; align-items:center; justify-content:center;
+    font-size:18px; cursor:pointer;
+  }
+  #jumpBottomBtn.show{display:flex;}
+  #jumpBottomBtn:hover{border-color:var(--blue); color:var(--blue);}
+  body.compact-ui .msg-row{padding:2px 6px; gap:8px;}
+  body.compact-ui .msg-list{gap:0; padding-top:7px;}
+  body.compact-ui .msg-row .avatar{width:28px !important; height:28px !important;}
+  body.compact-ui .msg-text{line-height:1.35;}
+  body.zen-ui .sidebar, body.zen-ui .member-panel{display:none !important;}
+  body.zen-ui .main{width:100%;}
+  body.font-small{font-size:12px;}
+  body.font-small .msg-text{font-size:12px;}
+  body.font-large{font-size:16px;}
+  body.font-large .msg-text{font-size:16px;}
+  body.no-motion *, body.no-motion *::before, body.no-motion *::after{animation:none !important; transition:none !important; scroll-behavior:auto !important;}
+  body.high-contrast{--text:#fff; --text-dim:#d7d9dd; --text-faint:#999fa8; --border:#484c54; --border-soft:#343840;}
+  .msg-time.full-time{font-variant-numeric:tabular-nums;}
+  .msg-actions button[data-act="copy"], .msg-actions button[data-act="bookmark"]{font-size:11.5px;}
+  .fav-on{color:var(--warn) !important;}
+  .tool-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:8px;}
+  .tool-grid .btn{width:100%;}
+  .tool-section{margin-top:16px; padding-top:12px; border-top:1px solid var(--border-soft);}
+  .tool-section:first-of-type{margin-top:0; padding-top:0; border-top:none;}
+  .tool-note{font-size:11.5px;color:var(--text-faint);margin-top:5px;}
+  @media (max-width:640px){
+    #jumpBottomBtn{right:14px; bottom:86px;}
+    .tool-grid{grid-template-columns:1fr;}
+  }
+
 </style>
 </head>
 <body>
@@ -605,6 +641,8 @@
       <div class="topbar-right">
         <button class="icon-btn hidden" id="searchBtn" title="메시지 검색">🔍</button>
         <button class="icon-btn hidden" id="exportBtn" title="채팅 내보내기">💾</button>
+        <button class="icon-btn hidden" id="favChanBtn" title="현재 채널 즐겨찾기">☆</button>
+        <button class="icon-btn" id="toolsBtn" title="NEXTBOT 도구/설정">⌘</button>
         <button class="icon-btn" id="notifBtn">🔔<span class="badge-count hidden" id="notifCount">0</span></button>
         <button class="icon-btn" id="memberBtn" title="팀원 목록">👥</button>
       </div>
@@ -681,6 +719,7 @@
   </aside>
 </div>
 
+<button id="jumpBottomBtn" title="맨 아래로">↓</button>
 <div id="toastWrap"></div>
 
 <script type="module">
@@ -780,6 +819,62 @@ const HELP_ADMIN_COMMANDS = [
   { cmd:"/채널생성 카테고리명|채널명", desc:"채널을 새로 만들어요. (관리자)" },
 ];
 
+/* ---------------- NEXTBOT Mega Pack: 약 50개 추가 기능 ---------------- */
+const NEXTBOT_EXTRA_COMMANDS = [
+  {cmd:"/내점수",desc:"이번 주 내 MVP 활동 점수를 확인해요."},
+  {cmd:"/내순위",desc:"이번 주 내 MVP 순위를 확인해요."},
+  {cmd:"/랭킹 [1~20]",desc:"이번 주 TOP N 랭킹을 보여줘요."},
+  {cmd:"/지난주순위 [1~20]",desc:"지난주 활동 TOP N을 보여줘요."},
+  {cmd:"/점수설명",desc:"MVP 점수 계산법을 알려줘요."},
+  {cmd:"/mvp상태",desc:"현재 MVP 투표/집계 상태를 보여줘요."},
+  {cmd:"/mvp기록 [1~20]",desc:"최근 MVP 결과를 보여줘요."},
+  {cmd:"/mvp횟수",desc:"역대 MVP 우승 횟수 순위를 보여줘요."},
+  {cmd:"/내프로필",desc:"내 닉네임·역할·접속 상태를 보여줘요."},
+  {cmd:"/프로필 닉네임",desc:"팀원의 프로필을 찾아 보여줘요."},
+  {cmd:"/팀원",desc:"전체 팀원 목록을 역할별로 보여줘요."},
+  {cmd:"/역할 역할명",desc:"특정 역할의 팀원을 찾아요."},
+  {cmd:"/오프라인",desc:"오프라인 팀원과 마지막 상태 갱신 시간을 보여줘요."},
+  {cmd:"/채널목록",desc:"내가 볼 수 있는 채널을 보여줘요."},
+  {cmd:"/채널정보",desc:"현재 채널 정보를 보여줘요."},
+  {cmd:"/팀통계",desc:"이번 주 팀 활동 요약을 보여줘요."},
+  {cmd:"/메시지수",desc:"현재 화면에 불러온 메시지 수를 보여줘요."},
+  {cmd:"/최근 [1~10]",desc:"현재 채널의 최근 메시지를 요약해요."},
+  {cmd:"/읽지않음",desc:"읽지 않은 채널을 찾아줘요."},
+  {cmd:"/공지목록",desc:"최근 공지를 보여줘요."},
+  {cmd:"/일정목록",desc:"다가오는 일정을 보여줘요."},
+  {cmd:"/할일추가 내용",desc:"개인 할 일을 추가해요."},
+  {cmd:"/할일",desc:"개인 할 일 목록을 보여줘요."},
+  {cmd:"/할일완료 번호",desc:"할 일을 완료/미완료 전환해요."},
+  {cmd:"/할일삭제 번호",desc:"할 일을 삭제해요."},
+  {cmd:"/할일초기화",desc:"완료된 할 일을 한꺼번에 정리해요."},
+  {cmd:"/메모 내용",desc:"개인 메모를 저장해요."},
+  {cmd:"/메모목록",desc:"저장한 개인 메모를 보여줘요."},
+  {cmd:"/메모삭제 번호",desc:"개인 메모를 삭제해요."},
+  {cmd:"/타이머 10m",desc:"초(s)·분(m)·시간(h) 타이머를 시작해요."},
+  {cmd:"/타이머취소",desc:"실행 중인 타이머를 취소해요."},
+  {cmd:"/계산 식",desc:"간단한 사칙연산을 계산해요."},
+  {cmd:"/선택 A|B|C",desc:"여러 선택지 중 하나를 골라줘요."},
+  {cmd:"/숫자 최소|최대",desc:"범위 안의 임의 정수를 뽑아요."},
+  {cmd:"/비밀번호 [길이]",desc:"강한 임시 비밀번호를 로컬에서 생성해요."},
+  {cmd:"/uuid",desc:"UUID를 하나 생성해요."},
+  {cmd:"/시간",desc:"현재 시간을 보여줘요."},
+  {cmd:"/오늘",desc:"오늘 날짜와 요일을 보여줘요."},
+  {cmd:"/핑",desc:"Firestore 왕복 지연시간을 측정해요."},
+  {cmd:"/북마크",desc:"내 메시지 북마크 목록을 열어요."},
+  {cmd:"/즐겨찾기",desc:"현재 채널을 즐겨찾기/해제해요."},
+  {cmd:"/즐겨찾기목록",desc:"즐겨찾기한 채널을 보여줘요."},
+  {cmd:"/컴팩트",desc:"채팅을 촘촘하게 표시하는 모드를 전환해요."},
+  {cmd:"/젠",desc:"사이드 패널을 숨기는 집중 모드를 전환해요."},
+  {cmd:"/글자크기 작게|보통|크게",desc:"채팅 글자 크기를 바꿔요."},
+  {cmd:"/시간표시",desc:"메시지 시간을 짧게/전체 날짜로 전환해요."},
+  {cmd:"/효과",desc:"화면 애니메이션 효과를 켜고 꺼요."},
+  {cmd:"/강조",desc:"고대비 표시 모드를 전환해요."},
+  {cmd:"/설정초기화",desc:"개인 UI 설정을 기본값으로 되돌려요."},
+  {cmd:"/단축키",desc:"키보드 단축키를 보여줘요."},
+];
+HELP_COMMANDS.push(...NEXTBOT_EXTRA_COMMANDS);
+
+
 /* ---------------- MVP 자동 선정 설정 ----------------
    매주 월요일(주 시작), 지난주 채팅 활동(메시지+리액션)을 집계해 TOP3를 뽑고
    봇이 투표를 올립니다. 그 다음 주가 시작되면 투표를 집계해 우승자를 발표해요.
@@ -859,7 +954,10 @@ function renderMentions(text){
 function fmtTime(ts){
   if(!ts) return '';
   const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleString('ko-KR', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
+  const full = (typeof isFullTimeEnabled==='function') ? isFullTimeEnabled() : false;
+  return d.toLocaleString('ko-KR', full
+    ? {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}
+    : {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 }
 function rolesLabel(roles){
   if(!roles || !roles.length) return ROLE_DEFS.member.short;
@@ -976,6 +1074,7 @@ function enterApp(){
   if(myDoc.isAdmin){ $('navAdmin').style.display='flex'; }
   $('botModeBtn').classList.toggle('hidden', !canUseAdminCommands());
   botModeOn=false; updateBotModeUI();
+  applyUiSettings();
 
   setupPresence();
   listenUsers();
@@ -1262,7 +1361,7 @@ function showDashboard(){
   $('chatView').classList.add('hidden');
   $('featureView').classList.add('hidden');
   $('calendarView').classList.add('hidden');
-  closeSearch(); $('searchBtn').classList.add('hidden'); $('exportBtn').classList.add('hidden');
+  closeSearch(); $('searchBtn').classList.add('hidden'); $('exportBtn').classList.add('hidden'); $('favChanBtn').classList.add('hidden');
   if(msgUnsub){ msgUnsub(); msgUnsub=null; }
   if(typingUnsub){ typingUnsub(); typingUnsub=null; }
   renderSidebarChannels();
@@ -1275,6 +1374,7 @@ function openChannel(chanId, chanName, catName){
   const chObj = channels.find(c=>c.id===chanId);
   if(chObj && !canSeeChannel(chObj)){ toast('이 채널에 접근할 권한이 없습니다.'); showDashboard(); return; }
   currentChannelId=chanId; currentChannelName=chanName;
+  $('favChanBtn').classList.remove('hidden'); updateFavoriteChannelButton();
   document.querySelectorAll('.sb-nav-item').forEach(e=>e.classList.remove('active'));
   $('chanTitle').innerHTML=`<span class="hash">#</span> ${escapeHtml(chanName)}`;
   $('dashboardView').classList.add('hidden');
@@ -1314,6 +1414,7 @@ function openChatChannel(chanId){
   markChannelRead(chanId);
   replyTarget=null; renderReplyPreview();
   pendingAttachments=[]; renderAttachPreview();
+  restoreChannelDraft(chanId);
   closeSearch();
   $('searchBtn').classList.remove('hidden');
   $('exportBtn').classList.remove('hidden');
@@ -1435,7 +1536,7 @@ function renderMessage(id, m){
       <div class="msg-head">
         <span class="msg-nick">${escapeHtml(u.nickname||'알 수 없음')}</span>
         <span class="role-badge" style="color:${roleColor}; background:${roleColor}22;">${escapeHtml(roleTxt)}</span>
-        <span class="msg-time">${fmtTime(m.createdAt)}</span>
+        <span class="msg-time" title="${escapeHtml(fullDateTime(m.createdAt))}">${fmtTime(m.createdAt)}</span>
         ${m.editedAt?'<span class="msg-edited">(수정됨)</span>':''}
         ${m.pinned?'<span class="msg-edited" style="color:var(--warn);">📌 고정됨</span>':''}
       </div>
@@ -1445,17 +1546,21 @@ function renderMessage(id, m){
     <div class="msg-actions">
       <button data-act="react">😀</button>
       <button data-act="reply">답장</button>
+      <button data-act="copy">복사</button>
+      <button data-act="bookmark">🔖</button>
       ${canPin?`<button data-act="pin">${m.pinned?'고정해제':'고정'}</button>`:''}
       ${(mine && !isPoll)?'<button data-act="edit">수정</button>':''}
       ${(mine||myDoc.isAdmin)?'<button data-act="del">삭제</button>':''}
     </div>`;
+  row.querySelector('[data-act="copy"]').onclick=()=>copyMessageText(m, u);
+  row.querySelector('[data-act="bookmark"]').onclick=()=>toggleMessageBookmark(id, m, u);
   row.querySelector('[data-act="reply"]').onclick=()=>{
     replyTarget={ id, nickname:u.nickname, snippet: isPoll ? ('📊 '+(m.question||'')) : m.content }; renderReplyPreview(); $('msgInput').focus();
   };
   const editBtn=row.querySelector('[data-act="edit"]');
   if(editBtn) editBtn.onclick=()=>startEdit(row, id, m.content);
   const delBtn=row.querySelector('[data-act="del"]');
-  if(delBtn) delBtn.onclick=()=>{ if(confirm('메시지를 삭제할까요?')) deleteDoc(doc(db,'channels',currentChannelId,'messages',id)); };
+  if(delBtn) delBtn.onclick=()=>{ if(confirm('메시지를 삭제할까요?')) deleteMessageWithStats(id,m); };
   const pinBtn=row.querySelector('[data-act="pin"]');
   if(pinBtn) pinBtn.onclick=()=>updateDoc(doc(db,'channels',currentChannelId,'messages',id), { pinned: !m.pinned });
   row.querySelector('[data-act="react"]').onclick=(e)=>openReactionPicker(e.currentTarget, id);
@@ -1481,6 +1586,16 @@ function renderMessage(id, m){
     if(!wasOpen) row.classList.add('touch-open');
   });
   $('msgList').appendChild(row);
+}
+async function deleteMessageWithStats(id,m){
+  try{
+    await deleteDoc(doc(db,'channels',currentChannelId,'messages',id));
+    if(m && m.userId && m.userId!=='BOT' && !m.isBot){
+      const created=m.createdAt?.toDate?m.createdAt.toDate():(m.createdAt?new Date(m.createdAt):new Date());
+      await bumpStat('msgCount',m.userId,-1,weekIdOf(created)).catch(()=>{});
+      // 리액션은 '누른 시점의 주차'에 집계되며 개별 타임스탬프가 없으므로 삭제 시 임의 차감하지 않습니다.
+    }
+  }catch(e){ console.error('delete message error',e); toast('메시지 삭제 중 오류가 발생했어요.'); }
 }
 function renderReactions(box, msgId, reactions){
   const entries = Object.entries(reactions).filter(([emoji,uids])=>uids && uids.length);
@@ -1558,6 +1673,7 @@ function renderAttachPreview(){
 
 const msgInput=$('msgInput');
 msgInput.addEventListener('input', ()=>{
+  saveChannelDraft();
   msgInput.style.height='auto'; msgInput.style.height=Math.min(msgInput.scrollHeight,140)+'px';
   $('sendBtn').disabled = !msgInput.value.trim() && !pendingAttachments.length;
   handleMentionPopup();
@@ -1574,7 +1690,7 @@ async function sendMessage(){
   const text=msgInput.value.trim();
   if((!text && !pendingAttachments.length) || !currentChannelId) return;
   if(text.startsWith('/') && !pendingAttachments.length){
-    msgInput.value=''; msgInput.style.height='auto'; $('sendBtn').disabled=true;
+    msgInput.value=''; msgInput.style.height='auto'; clearChannelDraft(currentChannelId); $('sendBtn').disabled=true;
     replyTarget=null; renderReplyPreview();
     await handleSlashCommand(text);
     setTypingState(false);
@@ -1598,7 +1714,7 @@ async function sendMessage(){
     // 통계 권한 설정이 잘못돼도 이미 성공한 메시지 전송 자체를 실패로 처리하지는 않습니다.
     try{ await bumpStat('msgCount', currentUser.uid); }
     catch(e){ toast('메시지는 전송됐지만 MVP 통계 기록에 실패했어요. Firebase 권한을 확인해주세요.'); }
-    msgInput.value=''; msgInput.style.height='auto';
+    msgInput.value=''; msgInput.style.height='auto'; clearChannelDraft(currentChannelId);
     replyTarget=null; renderReplyPreview();
     pendingAttachments=[]; renderAttachPreview();
   }catch(e){
@@ -1647,9 +1763,9 @@ function prevWeekId(weekId){
   dt.setDate(dt.getDate()-7);
   return weekIdOf(dt);
 }
-async function bumpStat(field, uid, n=1){
+async function bumpStat(field, uid, n=1, weekOverride=null){
   if(!uid || !n) return;
-  const wk=weekIdOf(new Date());
+  const wk=weekOverride || weekIdOf(new Date());
   const sref=doc(db,'stats',wk);
   try{
     // 트랜잭션으로 동시 업데이트를 안전하게 처리하고, 리액션 취소 시 0 아래로 내려가지 않게 합니다.
@@ -1805,6 +1921,310 @@ window.addEventListener('keydown', (e)=>{
     toggleBotMode();
   }
 });
+
+/* ============================================================
+   NEXTBOT MEGA PACK
+   - MVP/랭킹, 팀 정보, 개인 생산성, 유틸리티, 채팅 UX/설정
+   - 개인 데이터(todo/note/bookmark/favorites/settings/draft)는 계정별 localStorage 사용
+   ============================================================ */
+let localTimerHandle=null, localTimerEnd=0;
+
+function userStoreKey(name){ return `nextbot:${currentUser?.uid||'guest'}:${name}`; }
+function storeGet(name, fallback){
+  try{ const v=localStorage.getItem(userStoreKey(name)); return v===null ? fallback : JSON.parse(v); }
+  catch(_){ return fallback; }
+}
+function storeSet(name, value){
+  try{ localStorage.setItem(userStoreKey(name), JSON.stringify(value)); }catch(e){ console.warn('local store failed',e); }
+}
+function fullDateTime(ts){
+  if(!ts) return '';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function uiSettings(){ return storeGet('ui',{compact:false,zen:false,font:'normal',fullTime:false,motion:true,contrast:false}); }
+function saveUiSettings(v){ storeSet('ui',v); applyUiSettings(); }
+function isFullTimeEnabled(){ return !!uiSettings().fullTime; }
+function applyUiSettings(){
+  const u=uiSettings();
+  document.body.classList.toggle('compact-ui',!!u.compact);
+  document.body.classList.toggle('zen-ui',!!u.zen);
+  document.body.classList.toggle('font-small',u.font==='small');
+  document.body.classList.toggle('font-large',u.font==='large');
+  document.body.classList.toggle('no-motion',u.motion===false);
+  document.body.classList.toggle('high-contrast',!!u.contrast);
+}
+function rerenderCurrentChannel(){ if(currentChannelId && !FEATURE_CHANNELS[currentChannelId]) openChatChannel(currentChannelId); }
+
+function saveChannelDraft(){
+  if(!currentUser || !currentChannelId || !msgInput) return;
+  const drafts=storeGet('drafts',{}); const v=msgInput.value||'';
+  if(v) drafts[currentChannelId]=v; else delete drafts[currentChannelId];
+  storeSet('drafts',drafts);
+}
+function restoreChannelDraft(chanId){
+  if(!currentUser || !msgInput) return;
+  const v=(storeGet('drafts',{})||{})[chanId]||'';
+  msgInput.value=v; msgInput.style.height='auto'; msgInput.style.height=Math.min(msgInput.scrollHeight,140)+'px';
+  $('sendBtn').disabled=!v.trim() && !pendingAttachments.length;
+}
+function clearChannelDraft(chanId){
+  if(!chanId) return; const drafts=storeGet('drafts',{}); delete drafts[chanId]; storeSet('drafts',drafts);
+}
+
+async function copyTextSafe(text){
+  try{
+    if(navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(text); return true; }
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+    const ok=document.execCommand('copy'); ta.remove(); return !!ok;
+  }catch(_){ return false; }
+}
+async function copyMessageText(m,u){
+  const text=m.type==='poll' ? `📊 ${m.question||''}` : (m.content||'');
+  toast(await copyTextSafe(`${u.nickname||'알 수 없음'}: ${text}`)?'메시지를 복사했습니다.':'복사에 실패했어요.');
+}
+function getBookmarks(){ return storeGet('bookmarks',[]); }
+function toggleMessageBookmark(id,m,u){
+  let arr=getBookmarks(); const idx=arr.findIndex(x=>x.channelId===currentChannelId && x.msgId===id);
+  if(idx>=0){ arr.splice(idx,1); toast('북마크를 해제했습니다.'); }
+  else{
+    arr.unshift({channelId:currentChannelId,channelName:currentChannelName,msgId:id,nickname:u.nickname||'?',text:m.type==='poll'?('📊 '+(m.question||'')):(m.content||''),savedAt:Date.now()});
+    arr=arr.slice(0,100); toast('메시지를 북마크했습니다.');
+  }
+  storeSet('bookmarks',arr);
+}
+function openBookmarksModal(){
+  const arr=getBookmarks();
+  const rows=arr.length?arr.map((b,i)=>`<div class="day-evt-row"><div style="min-width:0;flex:1;"><b>${i+1}. #${escapeHtml(b.channelName||'?')} · ${escapeHtml(b.nickname||'?')}</b><div class="meta">${escapeHtml((b.text||'').slice(0,120))}</div></div><button class="btn btn-sm" data-bmjump="${i}">이동</button><button class="btn btn-sm btn-danger" data-bmdel="${i}">삭제</button></div>`).join(''):'<div class="dd-empty">저장한 북마크가 없습니다.</div>';
+  openModal(`<h3>🔖 메시지 북마크</h3>${rows}`,true);
+  document.querySelectorAll('[data-bmdel]').forEach(el=>el.onclick=()=>{ const a=getBookmarks(); a.splice(+el.dataset.bmdel,1); storeSet('bookmarks',a); openBookmarksModal(); });
+  document.querySelectorAll('[data-bmjump]').forEach(el=>el.onclick=()=>{
+    const b=getBookmarks()[+el.dataset.bmjump]; if(!b)return; const ch=channels.find(c=>c.id===b.channelId);
+    if(!ch){toast('해당 채널을 찾을 수 없어요.');return;} const cat=categories.find(c=>c.id===ch.categoryId); closeModal(); openChannel(ch.id,ch.name,cat?.name||'');
+    setTimeout(()=>{ const row=document.querySelector(`.msg-row[data-id="${b.msgId}"]`); if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.style.background='var(--blue-glow)';setTimeout(()=>row.style.background='',1200);}else toast('최근 200개 메시지 밖의 북마크일 수 있어요.'); },700);
+  });
+}
+
+function favorites(){ return storeGet('favorites',[]); }
+function isFavoriteChannel(id){ return favorites().includes(id); }
+function updateFavoriteChannelButton(){
+  const b=$('favChanBtn'); if(!b)return; const on=currentChannelId&&isFavoriteChannel(currentChannelId); b.textContent=on?'★':'☆'; b.classList.toggle('fav-on',!!on);
+}
+function toggleFavoriteChannel(){
+  if(!currentChannelId){toast('채널에서 사용해주세요.');return;}
+  let a=favorites(); const i=a.indexOf(currentChannelId); if(i>=0){a.splice(i,1);toast('즐겨찾기에서 해제했습니다.');}else{a.push(currentChannelId);toast('채널을 즐겨찾기했습니다.');}
+  storeSet('favorites',a); updateFavoriteChannelButton();
+}
+function openFavoriteChannelsModal(){
+  const a=favorites().map(id=>channels.find(c=>c.id===id)).filter(Boolean);
+  const rows=a.length?a.map(c=>`<div class="day-evt-row"><span>⭐ #${escapeHtml(c.name)}</span><button class="btn btn-sm" style="margin-left:auto" data-favopen="${c.id}">열기</button></div>`).join(''):'<div class="dd-empty">즐겨찾기한 채널이 없습니다.</div>';
+  openModal(`<h3>⭐ 즐겨찾기 채널</h3>${rows}`);
+  document.querySelectorAll('[data-favopen]').forEach(el=>el.onclick=()=>{const c=channels.find(x=>x.id===el.dataset.favopen);if(!c)return;const cat=categories.find(x=>x.id===c.categoryId);closeModal();openChannel(c.id,c.name,cat?.name||'');});
+}
+
+function todos(){ return storeGet('todos',[]); }
+function notes(){ return storeGet('notes',[]); }
+function prettyAgo(ms){
+  if(!ms)return '기록 없음'; const diff=Math.max(0,Date.now()-ms),m=Math.floor(diff/60000);
+  if(m<1)return '방금'; if(m<60)return `${m}분 전`; const h=Math.floor(m/60); if(h<24)return `${h}시간 전`; return `${Math.floor(h/24)}일 전`;
+}
+function parseTimerArg(s){
+  const m=String(s||'').trim().toLowerCase().match(/^(\d+(?:\.\d+)?)\s*(s|m|h|초|분|시간)?$/); if(!m)return 0;
+  const n=Number(m[1]); const u=m[2]||'s'; const mult=(u==='h'||u==='시간')?3600000:(u==='m'||u==='분')?60000:1000; return Math.round(n*mult);
+}
+function safeCalc(expr){
+  let e=String(expr||'').replace(/\^/g,'**'); if(!e || !/^[0-9+\-*/%().\s*]+$/.test(e)) throw new Error('지원하지 않는 문자');
+  const v=Function(`"use strict"; return (${e})`)(); if(typeof v!=='number'||!Number.isFinite(v))throw new Error('계산 불가'); return v;
+}
+function normalizeRoleTerm(t){
+  const x=(t||'').replace(/^@/,'').trim(); const map={'선생님':'teacher','팀장':'leader','팀원':'member','코딩팀':'coding','메이킹팀':'making'}; return map[x]||x;
+}
+async function queryMvpWeeks(n=10){
+  const q=query(collection(db,'mvp_weeks'),orderBy('weekId','desc'),limit(Math.min(100,Math.max(1,n)))); const snap=await getDocs(q); return snap.docs.map(d=>({id:d.id,...d.data()}));
+}
+function rankText(rows,n,title){
+  if(!rows.length)return `${title}\n집계된 활동이 없어요.`;
+  return `${title}\n`+rows.slice(0,n).map((r,i)=>`${i+1}. ${r.nickname} — ${r.score}점 (메시지 ${r.msgCount} / 받은 리액션 ${r.reactCount})`).join('\n');
+}
+function openShortcutModal(){
+  openModal(`<h3>⌨️ 키보드 단축키</h3>
+  <div class="day-evt-row"><b>Enter</b><span style="margin-left:auto">메시지 전송</span></div>
+  <div class="day-evt-row"><b>Shift + Enter</b><span style="margin-left:auto">줄바꿈</span></div>
+  <div class="day-evt-row"><b>Alt + T</b><span style="margin-left:auto">관리자 봇 모드</span></div>
+  <div class="day-evt-row"><b>Ctrl/Cmd + K</b><span style="margin-left:auto">현재 채널 메시지 검색</span></div>
+  <div class="day-evt-row"><b>Esc</b><span style="margin-left:auto">모달/검색 닫기</span></div>
+  <div class="day-evt-row"><b>End</b><span style="margin-left:auto">채팅 맨 아래로</span></div>`,false);
+}
+function openToolsModal(){
+  const u=uiSettings();
+  openModal(`<h3>⌘ NEXTBOT 도구</h3>
+    <div class="tool-section"><b>화면</b><div class="tool-grid">
+      <button class="btn" id="toolCompact">${u.compact?'✓ ':''}컴팩트 모드</button>
+      <button class="btn" id="toolZen">${u.zen?'✓ ':''}젠 모드</button>
+      <button class="btn" id="toolContrast">${u.contrast?'✓ ':''}고대비</button>
+      <button class="btn" id="toolMotion">${u.motion===false?'✓ ':''}효과 끄기</button>
+    </div></div>
+    <div class="tool-section"><b>개인 도구</b><div class="tool-grid">
+      <button class="btn" id="toolBookmarks">🔖 북마크</button>
+      <button class="btn" id="toolFavs">★ 즐겨찾기 채널</button>
+      <button class="btn" id="toolShortcuts">⌨ 단축키</button>
+      <button class="btn" id="toolHelp">🤖 전체 명령어</button>
+    </div><div class="tool-note">할 일·메모·북마크·화면 설정은 이 계정의 현재 브라우저에 저장됩니다.</div></div>`,true);
+  $('toolCompact').onclick=()=>{const x=uiSettings();x.compact=!x.compact;saveUiSettings(x);openToolsModal();};
+  $('toolZen').onclick=()=>{const x=uiSettings();x.zen=!x.zen;saveUiSettings(x);openToolsModal();};
+  $('toolContrast').onclick=()=>{const x=uiSettings();x.contrast=!x.contrast;saveUiSettings(x);openToolsModal();};
+  $('toolMotion').onclick=()=>{const x=uiSettings();x.motion=x.motion===false?true:false;saveUiSettings(x);openToolsModal();};
+  $('toolBookmarks').onclick=openBookmarksModal;
+  $('toolFavs').onclick=openFavoriteChannelsModal;
+  $('toolShortcuts').onclick=openShortcutModal;
+  $('toolHelp').onclick=openCommandHelpModal;
+}
+
+async function handleMegaCommand(cmd,args){
+  switch(cmd){
+    case '/내점수': {
+      const r=await computeRanking(weekIdOf(new Date())); const me=r.find(x=>x.uid===currentUser.uid);
+      await postBotReply(me?`⭐ ${myDoc.nickname}님의 이번 주 점수: ${me.score}점\n메시지 ${me.msgCount}개 + 받은 리액션 ${me.reactCount}개 × ${MVP_REACT_WEIGHT}`:'⭐ 이번 주 MVP 집계 점수가 아직 없어요.'); return true;
+    }
+    case '/내순위': {
+      const r=await computeRanking(weekIdOf(new Date())); const i=r.findIndex(x=>x.uid===currentUser.uid);
+      await postBotReply(i>=0?`🏁 ${myDoc.nickname}님의 현재 순위는 ${i+1}위 / ${r.length}명입니다. (${r[i].score}점)`:'🏁 이번 주 순위에 아직 올라오지 않았어요.'); return true;
+    }
+    case '/랭킹': {
+      const n=Math.min(20,Math.max(1,parseInt(args)||10)); const r=await computeRanking(weekIdOf(new Date())); await postBotReply(rankText(r,n,`📊 이번 주 TOP ${n}`)); return true;
+    }
+    case '/지난주순위': {
+      const n=Math.min(20,Math.max(1,parseInt(args)||10)); const wk=prevWeekId(weekIdOf(new Date())); const r=await computeRanking(wk); await postBotReply(rankText(r,n,`📊 지난주 (${wk}) TOP ${n}`)); return true;
+    }
+    case '/점수설명': await postBotReply(`ℹ️ MVP 활동 점수\n• 일반 메시지 1개 = ${MVP_MSG_WEIGHT}점\n• 다른 사람이 내 메시지에 준 리액션 1개 = ${MVP_REACT_WEIGHT}점\n• 셀프 리액션/봇 메시지 제외\n• 관리자·팀장·선생님은 MVP 후보에서 제외`); return true;
+    case '/mvp상태': {
+      const wk=weekIdOf(new Date()), ps=await getDoc(doc(db,'mvp_weeks',wk));
+      if(!ps.exists()){await postBotReply('🏆 이번 주 MVP 투표가 아직 생성되지 않았어요. 지난주 후보가 2명 이상 모이면 자동 생성됩니다.');return true;}
+      const d=ps.data(); const status=d.tallyDone?'집계 완료':d.pollMsgId?'투표 진행 중':'대기 중'; await postBotReply(`🏆 MVP 상태 (${wk})\n상태: ${status}\n후보: ${(d.top3||[]).map(x=>x.nickname).join(', ')||'없음'}`); return true;
+    }
+    case '/mvp기록': {
+      const n=Math.min(20,Math.max(1,parseInt(args)||8)); const a=await queryMvpWeeks(n); const lines=a.map(x=>x.winnerNickname?`${x.weekId}: 🏆 ${x.winnerNickname}`:`${x.weekId}: ${x.noWinner?'투표 없음/무득표':x.tallyDone?'우승자 없음':'진행 중'}`); await postBotReply(lines.length?'📚 최근 MVP 기록\n'+lines.join('\n'):'📚 MVP 기록이 없습니다.'); return true;
+    }
+    case '/mvp횟수': {
+      const a=await queryMvpWeeks(100), c={}; a.forEach(x=>{if(x.winnerNickname)c[x.winnerNickname]=(c[x.winnerNickname]||0)+1;}); const rows=Object.entries(c).sort((a,b)=>b[1]-a[1]); await postBotReply(rows.length?'🏆 MVP 우승 횟수\n'+rows.map(([n,v],i)=>`${i+1}. ${n} — ${v}회`).join('\n'):'🏆 아직 MVP 우승 기록이 없습니다.'); return true;
+    }
+    case '/내프로필': {
+      const p=presenceData[currentUser.uid]; openModal(`<h3>👤 내 프로필</h3><div class="day-evt-row"><b>닉네임</b><span style="margin-left:auto">${escapeHtml(myDoc.nickname||'?')}</span></div><div class="day-evt-row"><b>역할</b><span style="margin-left:auto">${escapeHtml(rolesLabel(myDoc.roles))}${myDoc.isAdmin?' · 관리자':''}</span></div><div class="day-evt-row"><b>상태</b><span style="margin-left:auto">${p?.state==='online'?'🟢 온라인':'⚫ 오프라인'}</span></div>`); return true;
+    }
+    case '/프로필': {
+      if(!args){toast('사용법: /프로필 닉네임');return true;} const q=args.toLowerCase(); const u=Object.values(usersMap).find(x=>!x.isBot&&(x.nickname||'').toLowerCase()===q)||Object.values(usersMap).find(x=>!x.isBot&&(x.nickname||'').toLowerCase().includes(q));
+      if(!u){await postBotReply('👤 해당 팀원을 찾지 못했어요.');return true;} const p=presenceData[u.uid]; await postBotReply(`👤 ${u.nickname}\n역할: ${rolesLabel(u.roles)}${u.isAdmin?' · 관리자':''}\n상태: ${p?.state==='online'?'🟢 온라인':'⚫ 오프라인'}`); return true;
+    }
+    case '/팀원': {
+      const us=Object.values(usersMap).filter(x=>!x.isBot&&!x.disabled).sort((a,b)=>(a.nickname||'').localeCompare(b.nickname||'')); await postBotReply('👥 팀원 '+us.length+'명\n'+us.map(u=>`${presenceData[u.uid]?.state==='online'?'🟢':'⚫'} ${u.nickname} — ${rolesLabel(u.roles)}`).join('\n')); return true;
+    }
+    case '/역할': {
+      if(!args){toast('사용법: /역할 코딩팀');return true;} const r=normalizeRoleTerm(args); const us=Object.values(usersMap).filter(u=>!u.isBot&&(u.roles||[]).includes(r)); await postBotReply(`👥 ${args} (${us.length}명)\n`+(us.map(u=>u.nickname).join(', ')||'해당 팀원이 없습니다.')); return true;
+    }
+    case '/오프라인': {
+      const us=Object.values(usersMap).filter(u=>!u.isBot&&presenceData[u.uid]?.state!=='online'); const lines=us.map(u=>`${u.nickname} — ${prettyAgo(presenceData[u.uid]?.last_changed)}`); await postBotReply('⚫ 오프라인 팀원\n'+(lines.join('\n')||'모두 온라인입니다.')); return true;
+    }
+    case '/채널목록': {
+      const cs=channels.filter(canSeeChannel).sort((a,b)=>(a.position||0)-(b.position||0)); await postBotReply('🗂 볼 수 있는 채널 '+cs.length+'개\n'+cs.map(c=>'#'+c.name).join(' · ')); return true;
+    }
+    case '/채널정보': {
+      if(!currentChannelId){await postBotReply('채널 안에서 사용해주세요.');return true;} const c=channels.find(x=>x.id===currentChannelId)||{}; const cat=categories.find(x=>x.id===c.categoryId); await postBotReply(`ℹ️ #${currentChannelName}\n카테고리: ${cat?.name||'-'}\n접근 역할: ${(c.allowedRoles||[]).length?c.allowedRoles.map(x=>ROLE_DEFS[x]?.short||x).join(', '):'전체'}`); return true;
+    }
+    case '/팀통계': {
+      const r=await computeRanking(weekIdOf(new Date())); const total=r.reduce((a,x)=>a+x.score,0),msgs=r.reduce((a,x)=>a+x.msgCount,0),reacts=r.reduce((a,x)=>a+x.reactCount,0); const online=Object.values(presenceData).filter(x=>x?.state==='online').length; await postBotReply(`📈 이번 주 팀 통계\n집계 인원 ${r.length}명 · 온라인 ${online}명\n메시지 ${msgs}개 · 받은 리액션 ${reacts}개 · 총 ${total}점\n1위: ${r[0]?`${r[0].nickname} (${r[0].score}점)`:'없음'}`); return true;
+    }
+    case '/메시지수': {
+      const n=document.querySelectorAll('#msgList .msg-row').length; await postBotReply(`💬 현재 화면에 불러온 메시지는 ${n}개입니다.${n>=200?' (최근 200개 제한)':''}`); return true;
+    }
+    case '/최근': {
+      const n=Math.min(10,Math.max(1,parseInt(args)||5)); const rows=[...document.querySelectorAll('#msgList .msg-row')].slice(-n); const lines=rows.map(r=>`${r.querySelector('.msg-nick')?.textContent||'?'}: ${(r.querySelector('[data-text]')?.textContent||'📊 투표/첨부').slice(0,80)}`); await postBotReply(`🕘 최근 ${lines.length}개 메시지\n`+(lines.join('\n')||'메시지가 없습니다.')); return true;
+    }
+    case '/읽지않음': {
+      const a=channels.filter(c=>canSeeChannel(c)&&channelHasUnread(c)); await postBotReply(a.length?'🔵 읽지 않은 채널\n'+a.map(c=>'#'+c.name).join(', '):'✅ 읽지 않은 채널이 없습니다.'); return true;
+    }
+    case '/공지목록': {
+      const sn=await getDocs(query(collection(db,'announcements'),orderBy('createdAt','desc'),limit(5))); const a=sn.docs.map(d=>d.data()); await postBotReply(a.length?'📢 최근 공지\n'+a.map((x,i)=>`${i+1}. ${x.title}${x.content?' — '+x.content.slice(0,70):''}`).join('\n'):'📢 공지가 없습니다.'); return true;
+    }
+    case '/일정목록': {
+      const today=new Date().toISOString().slice(0,10); const sn=await getDocs(query(collection(db,'events'),where('date','>=',today),orderBy('date','asc'),limit(8))); const a=sn.docs.map(d=>d.data()); await postBotReply(a.length?'🗓 다가오는 일정\n'+a.map(x=>`${x.date} — ${x.title}`).join('\n'):'🗓 예정된 일정이 없습니다.'); return true;
+    }
+    case '/할일추가': {
+      if(!args){toast('사용법: /할일추가 센서 테스트');return true;} const a=todos(); a.push({text:args,done:false,at:Date.now()}); storeSet('todos',a.slice(-100)); toast(`✅ 할 일을 추가했어요: ${args}`); return true;
+    }
+    case '/할일': {
+      const a=todos(); const rows=a.length?a.map((x,i)=>`<div class="day-evt-row"><span>${i+1}. ${x.done?'✅':'⬜'} ${escapeHtml(x.text)}</span></div>`).join(''):'<div class="dd-empty">할 일이 없습니다.</div>'; openModal(`<h3>📝 내 할 일</h3>${rows}`,true); return true;
+    }
+    case '/할일완료': {
+      const a=todos(),i=(parseInt(args)||0)-1; if(!a[i]){toast('올바른 할 일 번호를 입력해주세요.');return true;} a[i].done=!a[i].done; storeSet('todos',a); toast(`${a[i].done?'✅ 완료':'↩️ 미완료'}: ${a[i].text}`); return true;
+    }
+    case '/할일삭제': {
+      const a=todos(),i=(parseInt(args)||0)-1; if(!a[i]){toast('올바른 할 일 번호를 입력해주세요.');return true;} const [x]=a.splice(i,1);storeSet('todos',a);toast(`🗑 할 일을 삭제했어요: ${x.text}`);return true;
+    }
+    case '/할일초기화': {
+      const a=todos(),b=a.filter(x=>!x.done),n=a.length-b.length;storeSet('todos',b);toast(`🧹 완료된 할 일 ${n}개를 정리했어요.`);return true;
+    }
+    case '/메모': {
+      if(!args){toast('사용법: /메모 내용');return true;} const a=notes();a.unshift({text:args,at:Date.now()});storeSet('notes',a.slice(0,100));toast('🗒 개인 메모를 저장했어요.');return true;
+    }
+    case '/메모목록': {
+      const a=notes(); const rows=a.length?a.slice(0,20).map((x,i)=>`<div class="day-evt-row"><span>${i+1}. ${escapeHtml(x.text)}</span></div>`).join(''):'<div class="dd-empty">저장된 메모가 없습니다.</div>'; openModal(`<h3>🗒 내 메모</h3>${rows}`,true); return true;
+    }
+    case '/메모삭제': {
+      const a=notes(),i=(parseInt(args)||0)-1;if(!a[i]){toast('올바른 메모 번호를 입력해주세요.');return true;}a.splice(i,1);storeSet('notes',a);toast('🗑 메모를 삭제했어요.');return true;
+    }
+    case '/타이머': {
+      const ms=parseTimerArg(args);if(ms<1000||ms>24*3600000){toast('예: /타이머 10m (1초~24시간)');return true;}if(localTimerHandle)clearTimeout(localTimerHandle);localTimerEnd=Date.now()+ms;localTimerHandle=setTimeout(()=>{localTimerHandle=null;localTimerEnd=0;toast('⏰ 타이머 종료!');if('Notification' in window&&Notification.permission==='granted')new Notification('NEXTBOT',{body:'설정한 타이머가 끝났어요!'});},ms);toast(`⏰ 타이머 시작: ${Math.round(ms/1000)}초`);return true;
+    }
+    case '/타이머취소': {
+      if(localTimerHandle){clearTimeout(localTimerHandle);localTimerHandle=null;localTimerEnd=0;toast('⏹ 타이머를 취소했어요.');}else toast('⏹ 실행 중인 타이머가 없어요.');return true;
+    }
+    case '/계산': {
+      try{await postBotReply(`🧮 ${args} = ${safeCalc(args)}`);}catch(_){toast('숫자와 + - * / % ( ) ^ 만 사용할 수 있어요.');}return true;
+    }
+    case '/선택': {
+      const a=args.split('|').map(x=>x.trim()).filter(Boolean);if(a.length<2){toast('사용법: /선택 A|B|C');return true;}await postBotReply(`🎯 선택: ${a[Math.floor(Math.random()*a.length)]}`);return true;
+    }
+    case '/숫자': {
+      const [aa,bb]=args.split('|').map(Number);if(!Number.isFinite(aa)||!Number.isFinite(bb)){toast('사용법: /숫자 1|100');return true;}const lo=Math.ceil(Math.min(aa,bb)),hi=Math.floor(Math.max(aa,bb));await postBotReply(`🔢 ${lo}~${hi} → ${lo+Math.floor(Math.random()*(hi-lo+1))}`);return true;
+    }
+    case '/비밀번호': {
+      const n=Math.min(64,Math.max(8,parseInt(args)||16)),chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*_-';const bytes=new Uint32Array(n);crypto.getRandomValues(bytes);const pw=[...bytes].map(x=>chars[x%chars.length]).join('');openModal(`<h3>🔐 임시 비밀번호</h3><div class="field"><input id="generatedPw" value="${escapeHtml(pw)}" readonly></div><button class="btn btn-primary" id="copyGeneratedPw">복사</button><div class="tool-note">이 값은 채팅방에 전송되지 않습니다. 중요한 계정에는 비밀번호 관리자를 권장합니다.</div>`);$('copyGeneratedPw').onclick=async()=>toast(await copyTextSafe(pw)?'비밀번호를 복사했습니다.':'복사 실패');return true;
+    }
+    case '/uuid': await postBotReply(`🆔 ${crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16);})}`); return true;
+    case '/시간': await postBotReply('🕒 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})); return true;
+    case '/오늘': await postBotReply('📅 '+new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long'})); return true;
+    case '/핑': {
+      const t=performance.now();await getDoc(doc(db,'users',currentUser.uid));await postBotReply(`🏓 Firestore 왕복 약 ${Math.round(performance.now()-t)}ms`);return true;
+    }
+    case '/북마크': openBookmarksModal(); return true;
+    case '/즐겨찾기': toggleFavoriteChannel(); return true;
+    case '/즐겨찾기목록': openFavoriteChannelsModal(); return true;
+    case '/컴팩트': {const x=uiSettings();x.compact=!x.compact;saveUiSettings(x);toast(`컴팩트 모드 ${x.compact?'ON':'OFF'}`);return true;}
+    case '/젠': {const x=uiSettings();x.zen=!x.zen;saveUiSettings(x);toast(`젠 모드 ${x.zen?'ON':'OFF'}`);return true;}
+    case '/글자크기': {
+      const map={'작게':'small','보통':'normal','크게':'large','small':'small','normal':'normal','large':'large'};if(!map[args]){toast('사용법: /글자크기 작게|보통|크게');return true;}const x=uiSettings();x.font=map[args];saveUiSettings(x);return true;
+    }
+    case '/시간표시': {const x=uiSettings();x.fullTime=!x.fullTime;saveUiSettings(x);rerenderCurrentChannel();toast(`전체 시간 표시 ${x.fullTime?'ON':'OFF'}`);return true;}
+    case '/효과': {const x=uiSettings();x.motion=x.motion===false?true:false;saveUiSettings(x);toast(`애니메이션 효과 ${x.motion?'ON':'OFF'}`);return true;}
+    case '/강조': {const x=uiSettings();x.contrast=!x.contrast;saveUiSettings(x);toast(`고대비 ${x.contrast?'ON':'OFF'}`);return true;}
+    case '/설정초기화': {storeSet('ui',{compact:false,zen:false,font:'normal',fullTime:false,motion:true,contrast:false});applyUiSettings();rerenderCurrentChannel();toast('UI 설정을 초기화했습니다.');return true;}
+    case '/단축키': openShortcutModal(); return true;
+  }
+  return false;
+}
+
+// UI wiring for extra features
+$('favChanBtn').onclick=toggleFavoriteChannel;
+$('toolsBtn').onclick=openToolsModal;
+$('jumpBottomBtn').onclick=()=>{const l=$('msgList'); if(l)l.scrollTo({top:l.scrollHeight,behavior:'smooth'});};
+$('msgList').addEventListener('scroll',()=>{const l=$('msgList'); const far=l.scrollHeight-l.scrollTop-l.clientHeight>260; $('jumpBottomBtn').classList.toggle('show',far && !document.body.classList.contains('zen-no-jump'));});
+window.addEventListener('keydown',(e)=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'&&currentChannelId&&!FEATURE_CHANNELS[currentChannelId]){e.preventDefault();$('searchBtn').click();}
+  if(e.key==='Escape'){ if($('modalBg'))closeModal(); else if(!$('searchBox').classList.contains('hidden'))closeSearch(); }
+  if(e.key==='End'&&currentChannelId&&!FEATURE_CHANNELS[currentChannelId]){const l=$('msgList');l.scrollTop=l.scrollHeight;}
+});
+applyUiSettings();
+
 function openCommandHelpModal(){
   const rows = list => list.map(c=>`<div class="day-evt-row"><span style="font-family:'SFMono-Regular',Consolas,monospace; color:var(--blue);">${escapeHtml(c.cmd)}</span><span style="margin-left:auto; color:var(--text-dim); font-size:12px;">${escapeHtml(c.desc)}</span></div>`).join('');
   openModal(`
@@ -1821,6 +2241,7 @@ async function handleSlashCommand(raw){
   const cmd = (spaceIdx===-1 ? trimmed : trimmed.slice(0,spaceIdx)).toLowerCase();
   const args = spaceIdx===-1 ? '' : trimmed.slice(spaceIdx+1).trim();
   try{
+    if(await handleMegaCommand(cmd,args)) return;
     switch(cmd){
       case '/help': case '/도움말': case '/명령어':
         openCommandHelpModal(); return;
