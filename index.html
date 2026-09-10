@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>NEXTBOT | ROBOFEST 2027</title>
+<title>NEXTBOT ULTRA | ROBOFEST 2027</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -560,6 +560,75 @@
     .tool-grid{grid-template-columns:1fr;}
   }
 
+  /* ---------- NEXTBOT ULTRA: dashboard + focus ---------- */
+  .ultra-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 16px;}
+  .ultra-stat{border:1px solid var(--border-soft);background:var(--panel);border-radius:10px;padding:13px 14px;min-width:0;}
+  .ultra-stat .us-label{font-size:10.5px;color:var(--text-faint);font-weight:700;letter-spacing:.03em;}
+  .ultra-stat .us-value{font-family:var(--font-display);font-size:22px;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ultra-stat .us-meta{font-size:10.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ultra-progress{height:7px;background:var(--panel-2);border-radius:20px;overflow:hidden;margin-top:8px;}
+  .ultra-progress>span{display:block;height:100%;background:var(--blue);border-radius:inherit;min-width:0;transition:width .25s ease;}
+  .mvp-podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:end;}
+  .mvp-place{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:9px;padding:10px;text-align:center;min-width:0;}
+  .mvp-place.p1{padding-top:16px;border-color:var(--blue-dim);}
+  .mvp-place .rank{font-size:18px;line-height:1;}
+  .mvp-place .name{font-weight:700;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mvp-place .score{font-size:11px;color:var(--text-faint);margin-top:2px;}
+  .quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .quick-actions button{width:100%;}
+  .dash-todo-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;}
+  .dash-todo-row:last-child{border-bottom:none;}
+  #focusPill{display:none;align-items:center;gap:7px;border:1px solid var(--blue-dim);background:var(--blue-glow);color:var(--blue);border-radius:20px;padding:5px 10px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
+  #focusPill.show{display:flex;}
+  .goal-box{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:8px;padding:10px 11px;font-size:12.5px;}
+  .goal-box.done{opacity:.65;text-decoration:line-through;}
+  .ultra-mini{font-size:11.5px;color:var(--text-faint);}
+  @media(max-width:980px){.ultra-summary{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:640px){.ultra-summary{grid-template-columns:repeat(2,1fr)}.mvp-podium{grid-template-columns:1fr}.quick-actions{grid-template-columns:1fr}#focusPill{max-width:115px;overflow:hidden;text-overflow:ellipsis;}}
+
+
+/* ========== ADMIN 50 UPDATE ========== */
+.admin50-tabs{display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid var(--border-soft);margin-bottom:16px;padding-bottom:2px}
+.admin50-tab{border:0;background:transparent;color:var(--text-faint);font-weight:700;font-size:12px;padding:9px 10px;border-radius:7px 7px 0 0;white-space:nowrap}
+.admin50-tab:hover{color:var(--text);background:var(--panel-2)}
+.admin50-tab.active{color:var(--blue);background:var(--blue-glow)}
+.admin50-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.admin50-stat{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:9px;padding:12px}
+.admin50-stat .v{font-family:var(--font-display);font-size:22px;font-weight:700}
+.admin50-stat .k{font-size:10.5px;color:var(--text-faint);margin-top:2px}
+.admin50-card{border:1px solid var(--border-soft);background:var(--panel);border-radius:10px;padding:14px;margin-bottom:12px}
+.admin50-card h4{font-size:12px;color:var(--text-dim);margin-bottom:10px}
+.admin50-toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.admin50-toolbar input,.admin50-toolbar select,.admin50-input{background:var(--panel-2);border:1px solid var(--border);border-radius:7px;padding:8px 9px;color:var(--text);font-size:12px}
+.admin50-toolbar input{min-width:190px;flex:1}
+.admin50-table{width:100%;border-collapse:collapse;font-size:12px}
+.admin50-table th{text-align:left;color:var(--text-faint);font-size:10.5px;padding:7px;border-bottom:1px solid var(--border)}
+.admin50-table td{padding:8px 7px;border-bottom:1px solid var(--border-soft);vertical-align:middle}
+.admin50-table tr:last-child td{border-bottom:0}
+.admin50-table .actions{display:flex;gap:5px;flex-wrap:wrap}
+.admin50-muted{color:var(--text-faint);font-size:11px}
+.admin50-danger{border-color:rgba(255,92,92,.35)!important;color:var(--danger)!important}
+.admin50-ok{color:var(--ok)}
+.admin50-warn{color:var(--warn)}
+.admin50-section-title{display:flex;align-items:center;gap:8px;margin:4px 0 10px;font-weight:800;font-size:13px}
+.admin50-badge{font-size:10px;padding:2px 6px;border-radius:10px;background:var(--panel-2);color:var(--text-faint)}
+.admin50-log{padding:8px 0;border-bottom:1px solid var(--border-soft);font-size:11.5px}
+.admin50-log:last-child{border-bottom:0}
+.admin50-channel{display:grid;grid-template-columns:minmax(130px,1.3fr) minmax(120px,1fr) auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-soft)}
+.admin50-channel:last-child{border-bottom:0}
+.admin50-cat{border:1px solid var(--border-soft);border-radius:9px;padding:10px 12px;margin-bottom:10px;background:var(--panel)}
+.admin50-cat-head{display:flex;gap:7px;align-items:center;margin-bottom:7px}
+.admin50-cat-head b{flex:1}
+.admin50-check{width:16px;height:16px;accent-color:var(--blue)}
+.admin50-feature-chip{display:inline-flex;margin:3px 3px 0 0;padding:4px 7px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-soft);font-size:10.5px;color:var(--text-dim)}
+.admin50-locknote{padding:7px 10px;border-radius:7px;background:rgba(255,180,84,.09);border:1px solid rgba(255,180,84,.22);font-size:11px;color:var(--warn);margin:0 20px 8px}
+#systemAdminBanner{display:none;position:fixed;z-index:75;left:50%;transform:translateX(-50%);top:8px;max-width:min(820px,92vw);padding:8px 12px;border-radius:8px;background:var(--warn);color:#17120a;font-weight:700;font-size:12px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+@media(max-width:880px){
+  .admin50-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .admin50-channel{grid-template-columns:1fr}
+  .admin50-table{display:block;overflow-x:auto}
+}
+
 </style>
 </head>
 <body>
@@ -638,6 +707,7 @@
         <span>🔍</span><input type="text" id="searchInput" placeholder="이 채널에서 검색...">
         <span class="search-close" id="searchClose">✕</span>
       </div>
+      <div id="focusPill" title="집중 타이머 상태"><span>🎯</span><span id="focusPillText">집중 중</span></div>
       <div class="topbar-right">
         <button class="icon-btn hidden" id="searchBtn" title="메시지 검색">🔍</button>
         <button class="icon-btn hidden" id="exportBtn" title="채팅 내보내기">💾</button>
@@ -661,7 +731,21 @@
             <div class="dday-edit" id="ddayEditBtn">대회 날짜 설정</div>
           </div>
         </div>
+        <div class="ultra-summary" id="ultraSummary">
+          <div class="ultra-stat"><div class="us-label">내 주간 점수</div><div class="us-value" id="ultraMyScore">-</div><div class="us-meta" id="ultraMyScoreMeta">집계 중</div></div>
+          <div class="ultra-stat"><div class="us-label">내 순위</div><div class="us-value" id="ultraMyRank">-</div><div class="us-meta">MVP 후보 기준</div></div>
+          <div class="ultra-stat"><div class="us-label">미완료 할 일</div><div class="us-value" id="ultraTodoCount">0</div><div class="us-meta">개인 브라우저 저장</div></div>
+          <div class="ultra-stat"><div class="us-label">즐겨찾기 채널</div><div class="us-value" id="ultraFavCount">0</div><div class="us-meta">빠른 접근</div></div>
+          <div class="ultra-stat"><div class="us-label">온라인</div><div class="us-value" id="ultraOnlineCount">0</div><div class="us-meta">현재 접속 팀원</div></div>
+        </div>
         <div class="dash-grid">
+          <div class="dcard"><h3>🏆 이번 주 MVP TOP3 <span class="ultra-mini" id="ultraRankWeek"></span></h3><div id="ultraMvpTop"><div class="empty">집계 중...</div></div></div>
+          <div class="dcard"><h3>🎯 주간 목표</h3><div id="ultraGoal"><div class="empty">/주간목표 로 목표를 정해보세요</div></div></div>
+          <div class="dcard"><h3>📝 내 할 일</h3><div id="ultraTodos"><div class="empty">할 일이 없습니다</div></div></div>
+          <div class="dcard"><h3>⚡ 빠른 실행</h3><div class="quick-actions">
+            <button class="btn btn-sm" id="qaTodo">+ 할 일</button><button class="btn btn-sm" id="qaFocus">🎯 25분 집중</button>
+            <button class="btn btn-sm" id="qaRank">🏆 순위</button><button class="btn btn-sm" id="qaFav">★ 즐겨찾기</button>
+          </div></div>
           <div class="dcard"><h3>온라인 팀원</h3><div id="dashOnline" class="online-list"><div class="empty">아직 아무도 접속하지 않았습니다</div></div></div>
           <div class="dcard"><h3>최근 공지</h3><div id="dashAnnounce"><div class="empty">등록된 공지가 없습니다</div></div></div>
           <div class="dcard"><h3>다가오는 일정</h3><div id="dashEvents"><div class="empty">등록된 일정이 없습니다</div></div></div>
@@ -875,6 +959,48 @@ const NEXTBOT_EXTRA_COMMANDS = [
 HELP_COMMANDS.push(...NEXTBOT_EXTRA_COMMANDS);
 
 
+/* ---------------- NEXTBOT ULTRA: 추가 실사용 명령어 ---------------- */
+const NEXTBOT_ULTRA_COMMANDS = [
+  {cmd:"/상위3",desc:"이번 주 MVP TOP3를 바로 보여줘요."},
+  {cmd:"/메시지순위 [1~20]",desc:"메시지 작성 수 기준 순위를 보여줘요."},
+  {cmd:"/리액션순위 [1~20]",desc:"받은 리액션 수 기준 순위를 보여줘요."},
+  {cmd:"/내활동",desc:"이번 주 내 메시지·리액션·점수를 요약해요."},
+  {cmd:"/주간비교",desc:"이번 주와 지난주 팀 활동량을 비교해요."},
+  {cmd:"/mvp후보",desc:"현재 MVP 후보 TOP3를 보여줘요."},
+  {cmd:"/팀짜기 [팀수]",desc:"현재 팀원을 무작위로 N개 팀으로 나눠요."},
+  {cmd:"/순서 이름1|이름2|...",desc:"입력한 사람/항목 순서를 무작위로 섞어요."},
+  {cmd:"/당번 [명수]",desc:"현재 팀원 중 무작위 당번을 뽑아요."},
+  {cmd:"/랜덤팀원",desc:"현재 팀원 한 명을 무작위로 뽑아요."},
+  {cmd:"/역할통계",desc:"역할별 팀원 수를 보여줘요."},
+  {cmd:"/온라인수",desc:"현재 온라인 팀원 수를 보여줘요."},
+  {cmd:"/주간목표 내용",desc:"이번 주 개인 목표를 저장해요. 내용 없이 입력하면 확인."},
+  {cmd:"/목표완료",desc:"주간 목표 완료 상태를 전환해요."},
+  {cmd:"/목표삭제",desc:"현재 주간 목표를 삭제해요."},
+  {cmd:"/포모도로 [분]",desc:"집중 타이머를 시작해요. 기본 25분."},
+  {cmd:"/집중상태",desc:"현재 집중 타이머 남은 시간을 보여줘요."},
+  {cmd:"/집중취소",desc:"집중 타이머를 취소해요."},
+  {cmd:"/스톱워치 시작|정지|초기화",desc:"개인 스톱워치를 사용해요."},
+  {cmd:"/체크인 내용",desc:"오늘 한 일을 개인 체크인 기록으로 남겨요."},
+  {cmd:"/체크인목록",desc:"최근 개인 체크인 기록을 보여줘요."},
+  {cmd:"/오늘요약",desc:"점수·할 일·목표·집중 상태를 한 번에 보여줘요."},
+  {cmd:"/개인백업",desc:"할 일·메모·목표·북마크 등 개인 데이터를 JSON으로 백업해요."},
+  {cmd:"/초안목록",desc:"채널별 자동 저장된 작성 중 초안을 보여줘요."},
+  {cmd:"/초안삭제",desc:"현재 채널의 자동 저장 초안을 삭제해요."},
+  {cmd:"/검색 검색어",desc:"현재 채널 검색창을 열고 바로 검색해요."},
+  {cmd:"/채널이동 채널명",desc:"이름으로 채널을 찾아 바로 이동해요."},
+  {cmd:"/맨아래",desc:"현재 채팅의 맨 아래로 이동해요."},
+  {cmd:"/문자수 내용",desc:"문자 수와 공백 제외 문자 수를 세요."},
+  {cmd:"/단어수 내용",desc:"입력한 텍스트의 단어 수를 세요."},
+  {cmd:"/평균 숫자,숫자,...",desc:"숫자들의 평균을 계산해요."},
+  {cmd:"/중앙값 숫자,숫자,...",desc:"숫자들의 중앙값을 계산해요."},
+  {cmd:"/퍼센트 부분|전체",desc:"부분이 전체의 몇 %인지 계산해요."},
+  {cmd:"/셔플 A|B|C",desc:"항목 전체를 무작위 순서로 섞어요."},
+  {cmd:"/알림권한",desc:"브라우저 알림 권한을 요청해요."},
+];
+HELP_COMMANDS.push(...NEXTBOT_ULTRA_COMMANDS);
+
+
+
 /* ---------------- MVP 자동 선정 설정 ----------------
    매주 월요일(주 시작), 지난주 채팅 활동(메시지+리액션)을 집계해 TOP3를 뽑고
    봇이 투표를 올립니다. 그 다음 주가 시작되면 투표를 집계해 우승자를 발표해요.
@@ -1084,6 +1210,7 @@ function enterApp(){
   listenTestsDash();
   listenEventsAll();
   listenNotifications();
+  listenAdminAppSettings();
   loadDdaySetting();
   showDashboard();
 }
@@ -1129,6 +1256,7 @@ function renderPresence(val){
     }).join('')+'</div>';
   }
   renderMemberPanel();
+  if(typeof refreshUltraDashboard==='function' && !$('dashboardView').classList.contains('hidden')) refreshUltraDashboard();
 }
 function avatarHtml(u, size=28){
   const nick = u? (u.nickname||'?') : '?';
@@ -1203,6 +1331,7 @@ function listenStructure(){
     channels = snap.docs.map(d=>({id:d.id, ...d.data()}));
     ensureBotChannelExists();
     renderSidebarChannels();
+    if(typeof applyCurrentChannelAdminState==='function') applyCurrentChannelAdminState();
     // if an admin restricts the channel we're currently viewing, kick non-permitted users out
     if(currentChannelId && !myDoc.isAdmin){
       const cur = channels.find(c=>c.id===currentChannelId);
@@ -1247,7 +1376,7 @@ function renderSidebarChannels(){
   if(!categories.length){ box.innerHTML=''; return; }
   const catsSorted=[...categories].sort((a,b)=>(a.position||0)-(b.position||0));
   box.innerHTML = catsSorted.map(cat=>{
-    const chans = channels.filter(c=>c.categoryId===cat.id && canSeeChannel(c)).sort((a,b)=>(a.position||0)-(b.position||0));
+    const chans = channels.filter(c=>c.categoryId===cat.id && canSeeChannel(c) && (myDoc.isAdmin || !c.archived)).sort((a,b)=>(a.position||0)-(b.position||0));
     const collapsed = collapsedCats[cat.id];
     return `<div class="sb-cat" data-cat="${cat.id}">
       <div class="sb-cat-head ${collapsed?'collapsed':''}" data-toggle="${cat.id}">
@@ -1320,6 +1449,7 @@ $('addCatBtn').onclick=()=>{
 function canSeeChannel(ch){
   if(!ch) return false;
   if(myDoc && myDoc.isAdmin) return true;
+  if(ch.archived) return false;
   const allowed = ch.allowedRoles||[];
   if(!allowed.length) return true;
   const myRoles = (myDoc && myDoc.roles) || ['member'];
@@ -1365,6 +1495,7 @@ function showDashboard(){
   if(msgUnsub){ msgUnsub(); msgUnsub=null; }
   if(typingUnsub){ typingUnsub(); typingUnsub=null; }
   renderSidebarChannels();
+  if(typeof refreshUltraDashboard==='function') refreshUltraDashboard();
 }
 function setActiveNav(id){
   document.querySelectorAll('.sb-nav-item').forEach(e=>e.classList.remove('active'));
@@ -1441,6 +1572,7 @@ function openChatChannel(chanId){
     $('typingLine').textContent = names.length ? (names.join(', ')+'님이 입력 중...') : '';
   });
   typingUnsub=()=>off(typeRef);
+  if(typeof applyCurrentChannelAdminState==='function') applyCurrentChannelAdminState();
 }
 function renderPinBar(snap){
   const pinned=[];
@@ -1687,6 +1819,8 @@ msgInput.addEventListener('keydown',(e)=>{
 $('sendBtn').onclick=sendMessage;
 
 async function sendMessage(){
+  const chNow=channels.find(c=>c.id===currentChannelId);
+  if(chNow?.locked && !myDoc?.isAdmin){ toast('이 채널은 관리자가 쓰기 잠금했습니다.'); return; }
   const text=msgInput.value.trim();
   if((!text && !pendingAttachments.length) || !currentChannelId) return;
   if(text.startsWith('/') && !pendingAttachments.length){
@@ -1874,6 +2008,8 @@ let mvpCycleChecked=false;
 async function checkWeeklyMvpCycle(){
   if(mvpCycleChecked) return;
   if(!myDoc || !currentUser) return;
+  // 투표 생성/집계는 관리자·팀장·선생님 브라우저에서만 실행
+  if(!canUseAdminCommands()) return;
   mvpCycleChecked=true;
   try{
     const curWeek = weekIdOf(new Date());
@@ -2067,6 +2203,8 @@ function openToolsModal(){
     <div class="tool-section"><b>개인 도구</b><div class="tool-grid">
       <button class="btn" id="toolBookmarks">🔖 북마크</button>
       <button class="btn" id="toolFavs">★ 즐겨찾기 채널</button>
+      <button class="btn" id="toolFocus">🎯 25분 집중</button>
+      <button class="btn" id="toolBackup">💾 개인 백업</button>
       <button class="btn" id="toolShortcuts">⌨ 단축키</button>
       <button class="btn" id="toolHelp">🤖 전체 명령어</button>
     </div><div class="tool-note">할 일·메모·북마크·화면 설정은 이 계정의 현재 브라우저에 저장됩니다.</div></div>`,true);
@@ -2076,6 +2214,8 @@ function openToolsModal(){
   $('toolMotion').onclick=()=>{const x=uiSettings();x.motion=x.motion===false?true:false;saveUiSettings(x);openToolsModal();};
   $('toolBookmarks').onclick=openBookmarksModal;
   $('toolFavs').onclick=openFavoriteChannelsModal;
+  $('toolFocus').onclick=()=>{closeModal();startFocusTimer(25);};
+  $('toolBackup').onclick=()=>{const pack={exportedAt:new Date().toISOString(),todos:todos(),notes:notes(),bookmarks:getBookmarks(),favorites:favorites(),ui:uiSettings(),drafts:storeGet('drafts',{}),weeklyGoal:storeGet('weeklyGoal',null),checkins:checkins()};downloadJson(`nextbot-personal-backup-${new Date().toISOString().slice(0,10)}.json`,pack);toast('개인 데이터를 백업했어요.');};
   $('toolShortcuts').onclick=openShortcutModal;
   $('toolHelp').onclick=openCommandHelpModal;
 }
@@ -2149,19 +2289,19 @@ async function handleMegaCommand(cmd,args){
       const today=new Date().toISOString().slice(0,10); const sn=await getDocs(query(collection(db,'events'),where('date','>=',today),orderBy('date','asc'),limit(8))); const a=sn.docs.map(d=>d.data()); await postBotReply(a.length?'🗓 다가오는 일정\n'+a.map(x=>`${x.date} — ${x.title}`).join('\n'):'🗓 예정된 일정이 없습니다.'); return true;
     }
     case '/할일추가': {
-      if(!args){toast('사용법: /할일추가 센서 테스트');return true;} const a=todos(); a.push({text:args,done:false,at:Date.now()}); storeSet('todos',a.slice(-100)); toast(`✅ 할 일을 추가했어요: ${args}`); return true;
+      if(!args){toast('사용법: /할일추가 센서 테스트');return true;} const a=todos(); a.push({text:args,done:false,at:Date.now()}); storeSet('todos',a.slice(-100)); refreshUltraDashboard(); toast(`✅ 할 일을 추가했어요: ${args}`); return true;
     }
     case '/할일': {
       const a=todos(); const rows=a.length?a.map((x,i)=>`<div class="day-evt-row"><span>${i+1}. ${x.done?'✅':'⬜'} ${escapeHtml(x.text)}</span></div>`).join(''):'<div class="dd-empty">할 일이 없습니다.</div>'; openModal(`<h3>📝 내 할 일</h3>${rows}`,true); return true;
     }
     case '/할일완료': {
-      const a=todos(),i=(parseInt(args)||0)-1; if(!a[i]){toast('올바른 할 일 번호를 입력해주세요.');return true;} a[i].done=!a[i].done; storeSet('todos',a); toast(`${a[i].done?'✅ 완료':'↩️ 미완료'}: ${a[i].text}`); return true;
+      const a=todos(),i=(parseInt(args)||0)-1; if(!a[i]){toast('올바른 할 일 번호를 입력해주세요.');return true;} a[i].done=!a[i].done; storeSet('todos',a); refreshUltraDashboard(); toast(`${a[i].done?'✅ 완료':'↩️ 미완료'}: ${a[i].text}`); return true;
     }
     case '/할일삭제': {
-      const a=todos(),i=(parseInt(args)||0)-1; if(!a[i]){toast('올바른 할 일 번호를 입력해주세요.');return true;} const [x]=a.splice(i,1);storeSet('todos',a);toast(`🗑 할 일을 삭제했어요: ${x.text}`);return true;
+      const a=todos(),i=(parseInt(args)||0)-1; if(!a[i]){toast('올바른 할 일 번호를 입력해주세요.');return true;} const [x]=a.splice(i,1);storeSet('todos',a);refreshUltraDashboard();toast(`🗑 할 일을 삭제했어요: ${x.text}`);return true;
     }
     case '/할일초기화': {
-      const a=todos(),b=a.filter(x=>!x.done),n=a.length-b.length;storeSet('todos',b);toast(`🧹 완료된 할 일 ${n}개를 정리했어요.`);return true;
+      const a=todos(),b=a.filter(x=>!x.done),n=a.length-b.length;storeSet('todos',b);refreshUltraDashboard();toast(`🧹 완료된 할 일 ${n}개를 정리했어요.`);return true;
     }
     case '/메모': {
       if(!args){toast('사용법: /메모 내용');return true;} const a=notes();a.unshift({text:args,at:Date.now()});storeSet('notes',a.slice(0,100));toast('🗒 개인 메모를 저장했어요.');return true;
@@ -2213,6 +2353,152 @@ async function handleMegaCommand(cmd,args){
   return false;
 }
 
+
+/* ============================================================
+   NEXTBOT ULTRA PACK
+   - 기존 Firestore 컬렉션(stats/users) 조회 + 개인 localStorage 중심
+   - 새로운 서버 컬렉션을 만들지 않아 추가 Rules 없이 동작
+   ============================================================ */
+let focusTickHandle=null;
+
+function rawWeekStats(weekId){
+  return getDoc(doc(db,'stats',weekId)).then(s=>s.exists()?s.data():{});
+}
+function myRawWeekScore(data){
+  const m=Number((data.msgCount||{})[currentUser?.uid])||0;
+  const r=Number((data.reactCount||{})[currentUser?.uid])||0;
+  return {msgCount:m,reactCount:r,score:m*MVP_MSG_WEIGHT+r*MVP_REACT_WEIGHT};
+}
+function currentGoal(){
+  const g=storeGet('weeklyGoal',null);
+  const wk=weekIdOf(new Date());
+  if(!g || g.weekId!==wk) return null;
+  return g;
+}
+function setWeeklyGoal(text){
+  const g={weekId:weekIdOf(new Date()),text:String(text||'').trim(),done:false,createdAt:Date.now()};
+  storeSet('weeklyGoal',g); refreshUltraDashboard(); return g;
+}
+function checkins(){ return storeGet('checkins',[]); }
+function fmtDuration(ms){
+  ms=Math.max(0,Math.floor(ms||0));
+  const total=Math.floor(ms/1000), h=Math.floor(total/3600), m=Math.floor((total%3600)/60), s=total%60;
+  return h?`${h}시간 ${m}분 ${s}초`:m?`${m}분 ${s}초`:`${s}초`;
+}
+function focusState(){ return storeGet('focusTimer',null); }
+function stopFocusTimer(silent=false){
+  if(focusTickHandle){clearInterval(focusTickHandle);focusTickHandle=null;}
+  storeSet('focusTimer',null); refreshFocusPill(); if(!silent)toast('🎯 집중 타이머를 취소했어요.');
+}
+function startFocusTimer(minutes=25){
+  const min=Math.min(180,Math.max(1,Number(minutes)||25));
+  const st={startedAt:Date.now(),endAt:Date.now()+min*60000,minutes:min}; storeSet('focusTimer',st);
+  armFocusTimer(); refreshFocusPill(); refreshUltraDashboard(); toast(`🎯 ${min}분 집중 시작!`);
+}
+function armFocusTimer(){
+  if(focusTickHandle){clearInterval(focusTickHandle);focusTickHandle=null;}
+  const st=focusState(); if(!st)return;
+  if(st.endAt<=Date.now()){finishFocusTimer();return;}
+  focusTickHandle=setInterval(()=>{
+    const cur=focusState(); if(!cur){clearInterval(focusTickHandle);focusTickHandle=null;return;}
+    if(cur.endAt<=Date.now()){finishFocusTimer();return;}
+    refreshFocusPill();
+  },1000);
+}
+function finishFocusTimer(){
+  if(focusTickHandle){clearInterval(focusTickHandle);focusTickHandle=null;}
+  const st=focusState(); storeSet('focusTimer',null); refreshFocusPill(); refreshUltraDashboard();
+  toast('🎉 집중 타이머 완료!');
+  try{ if('Notification' in window&&Notification.permission==='granted') new Notification('NEXTBOT 집중 완료',{body:`${st?.minutes||''}분 집중 시간이 끝났어요.`}); }catch(_){}
+}
+function refreshFocusPill(){
+  const pill=$('focusPill'), txt=$('focusPillText'); if(!pill||!txt)return;
+  const st=focusState();
+  if(!st || st.endAt<=Date.now()){pill.classList.remove('show');return;}
+  pill.classList.add('show'); txt.textContent=`${Math.ceil((st.endAt-Date.now())/60000)}분 남음`;
+}
+function stopwatchState(){ return storeGet('stopwatch',{running:false,startAt:0,elapsed:0}); }
+function stopwatchElapsed(st=stopwatchState()){ return (Number(st.elapsed)||0)+(st.running?Math.max(0,Date.now()-Number(st.startAt||Date.now())):0); }
+function teamUsers(includeOffline=true){
+  return Object.values(usersMap).filter(u=>u.uid!=='BOT'&&!u.isBot&&!u.disabled&&(includeOffline||presenceData[u.uid]?.state==='online'));
+}
+function shuffleCopy(arr){
+  const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a;
+}
+function numericList(args){ return String(args||'').split(/[|,\s]+/).map(Number).filter(Number.isFinite); }
+function downloadJson(filename,obj){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function refreshUltraDashboard(){
+  if(!currentUser || !$('ultraMyScore')) return;
+  const wk=weekIdOf(new Date()); $('ultraRankWeek').textContent=wk;
+  $('ultraTodoCount').textContent=String(todos().filter(x=>!x.done).length);
+  $('ultraFavCount').textContent=String(favorites().filter(id=>channels.some(c=>c.id===id)).length);
+  $('ultraOnlineCount').textContent=String(Object.entries(presenceData||{}).filter(([uid,v])=>uid!=='BOT'&&v&&v.state==='online').length);
+
+  const g=currentGoal();
+  $('ultraGoal').innerHTML=g?`<div class="goal-box ${g.done?'done':''}">${g.done?'✅':'🎯'} ${escapeHtml(g.text)}<div class="ultra-mini" style="margin-top:5px;">${g.done?'완료됨':'/목표완료 로 완료 처리'}</div></div>`:'<div class="empty">/주간목표 목표내용 으로 설정하세요</div>';
+  const td=todos().filter(x=>!x.done).slice(0,4);
+  $('ultraTodos').innerHTML=td.length?td.map((x,i)=>`<div class="dash-todo-row"><span>⬜</span><span>${escapeHtml(x.text)}</span></div>`).join(''):'<div class="empty">미완료 할 일이 없습니다</div>';
+
+  try{
+    const [data,rank]=await Promise.all([rawWeekStats(wk),computeRanking(wk)]); const me=myRawWeekScore(data); const idx=rank.findIndex(x=>x.uid===currentUser.uid);
+    $('ultraMyScore').textContent=`${me.score}점`; $('ultraMyScoreMeta').textContent=`메시지 ${me.msgCount} · 리액션 ${me.reactCount}`; $('ultraMyRank').textContent=idx>=0?`${idx+1}위`:'-';
+    const top=rank.slice(0,3); const medals=['🥇','🥈','🥉'];
+    $('ultraMvpTop').innerHTML=top.length?`<div class="mvp-podium">${top.map((r,i)=>`<div class="mvp-place ${i===0?'p1':''}"><div class="rank">${medals[i]}</div><div class="name">${escapeHtml(r.nickname)}</div><div class="score">${r.score}점 · 💬${r.msgCount} · ❤️${r.reactCount}</div></div>`).join('')}</div>`:'<div class="empty">아직 집계된 MVP 활동이 없습니다</div>';
+  }catch(e){ console.warn('ultra dashboard stats failed',e); $('ultraMvpTop').innerHTML='<div class="empty">MVP 통계를 불러오지 못했습니다</div>'; }
+
+  const qTodo=$('qaTodo'),qFocus=$('qaFocus'),qRank=$('qaRank'),qFav=$('qaFav');
+  if(qTodo) qTodo.onclick=()=>{openModal(`<h3>📝 빠른 할 일 추가</h3><div class="field"><input id="qaTodoInput" placeholder="예: 센서 보정 테스트"></div><div class="modal-actions"><button class="btn" id="qaTodoCancel">취소</button><button class="btn btn-primary" id="qaTodoSave" style="width:auto">추가</button></div>`);$('qaTodoCancel').onclick=closeModal;$('qaTodoSave').onclick=()=>{const v=$('qaTodoInput').value.trim();if(!v)return;const a=todos();a.push({text:v,done:false,at:Date.now()});storeSet('todos',a.slice(-100));closeModal();refreshUltraDashboard();toast('할 일을 추가했어요.');};};
+  if(qFocus) qFocus.onclick=()=>startFocusTimer(25);
+  if(qRank) qRank.onclick=async()=>{try{const r=await computeRanking(wk);openModal(`<h3>🏆 이번 주 순위</h3>${r.slice(0,10).map((x,i)=>`<div class="day-evt-row"><b>${i+1}. ${escapeHtml(x.nickname)}</b><span style="margin-left:auto">${x.score}점</span></div>`).join('')||'<div class="dd-empty">집계가 없습니다.</div>'}`);}catch(e){toast('순위를 불러오지 못했어요.');}};
+  if(qFav) qFav.onclick=openFavoriteChannelsModal;
+  refreshFocusPill();
+}
+
+async function handleUltraCommand(cmd,args){
+  switch(cmd){
+    case '/상위3': case '/mvp후보': {const r=await computeRanking(weekIdOf(new Date()));await postBotReply(rankText(r,3,'🏆 이번 주 MVP TOP3'));return true;}
+    case '/메시지순위': {const n=Math.min(20,Math.max(1,parseInt(args)||10)),r=await computeRanking(weekIdOf(new Date()));r.sort((a,b)=>b.msgCount-a.msgCount||b.score-a.score);await postBotReply('💬 메시지 작성 순위\n'+(r.slice(0,n).map((x,i)=>`${i+1}. ${x.nickname} — ${x.msgCount}개`).join('\n')||'집계 없음'));return true;}
+    case '/리액션순위': {const n=Math.min(20,Math.max(1,parseInt(args)||10)),r=await computeRanking(weekIdOf(new Date()));r.sort((a,b)=>b.reactCount-a.reactCount||b.score-a.score);await postBotReply('❤️ 받은 리액션 순위\n'+(r.slice(0,n).map((x,i)=>`${i+1}. ${x.nickname} — ${x.reactCount}개`).join('\n')||'집계 없음'));return true;}
+    case '/내활동': {const d=await rawWeekStats(weekIdOf(new Date())),me=myRawWeekScore(d);await postBotReply(`📈 이번 주 내 활동\n메시지: ${me.msgCount}개\n받은 리액션: ${me.reactCount}개\nMVP 점수: ${me.score}점`);return true;}
+    case '/주간비교': {const cur=weekIdOf(new Date()),prev=prevWeekId(cur),[a,b]=await Promise.all([rawWeekStats(cur),rawWeekStats(prev)]);const sum=d=>({m:Object.values(d.msgCount||{}).reduce((x,y)=>x+(Number(y)||0),0),r:Object.values(d.reactCount||{}).reduce((x,y)=>x+(Number(y)||0),0)}),x=sum(a),y=sum(b);await postBotReply(`📊 주간 팀 활동 비교\n이번 주: 메시지 ${x.m} · 리액션 ${x.r}\n지난주: 메시지 ${y.m} · 리액션 ${y.r}\n변화: 메시지 ${x.m-y.m>=0?'+':''}${x.m-y.m} · 리액션 ${x.r-y.r>=0?'+':''}${x.r-y.r}`);return true;}
+    case '/팀짜기': {const n=Math.min(8,Math.max(2,parseInt(args)||2)),u=shuffleCopy(teamUsers(true));if(u.length<n){toast('팀원 수보다 팀 수가 많아요.');return true;}const teams=Array.from({length:n},()=>[]);u.forEach((x,i)=>teams[i%n].push(x.nickname));await postBotReply('🎲 랜덤 팀 편성\n'+teams.map((t,i)=>`팀 ${i+1}: ${t.join(', ')}`).join('\n'));return true;}
+    case '/순서': {let a=args.split('|').map(x=>x.trim()).filter(Boolean);if(a.length<2)a=teamUsers(true).map(x=>x.nickname);if(a.length<2){toast('항목을 2개 이상 입력해주세요.');return true;}await postBotReply('🔀 랜덤 순서\n'+shuffleCopy(a).map((x,i)=>`${i+1}. ${x}`).join('\n'));return true;}
+    case '/당번': {const n=Math.min(10,Math.max(1,parseInt(args)||1)),u=shuffleCopy(teamUsers(true));await postBotReply('🧹 오늘의 당번\n'+u.slice(0,Math.min(n,u.length)).map((x,i)=>`${i+1}. ${x.nickname}`).join('\n'));return true;}
+    case '/랜덤팀원': {const u=teamUsers(true);await postBotReply(u.length?`🎯 랜덤 팀원: ${u[Math.floor(Math.random()*u.length)].nickname}`:'팀원이 없습니다.');return true;}
+    case '/역할통계': {const c={teacher:0,leader:0,member:0,coding:0,making:0};teamUsers(true).forEach(u=>(u.roles||['member']).forEach(r=>{if(r in c)c[r]++;}));await postBotReply(`👥 역할 통계\n선생님 ${c.teacher} · 팀장 ${c.leader} · 팀원 ${c.member}\n코딩팀 ${c.coding} · 메이킹팀 ${c.making}`);return true;}
+    case '/온라인수': {const u=teamUsers(false);await postBotReply(`🟢 현재 온라인 ${u.length}명${u.length?' — '+u.map(x=>x.nickname).join(', '):''}`);return true;}
+    case '/주간목표': {if(args){const g=setWeeklyGoal(args);toast(`🎯 주간 목표 저장: ${g.text}`);}else{const g=currentGoal();await postBotReply(g?`🎯 이번 주 목표: ${g.done?'✅ ':''}${g.text}`:'🎯 아직 주간 목표가 없어요. /주간목표 목표내용 으로 설정하세요.');}return true;}
+    case '/목표완료': {const g=currentGoal();if(!g){toast('먼저 /주간목표 로 목표를 설정해주세요.');return true;}g.done=!g.done;storeSet('weeklyGoal',g);refreshUltraDashboard();toast(g.done?'✅ 목표 완료!':'↩️ 목표를 다시 진행 중으로 바꿨어요.');return true;}
+    case '/목표삭제': {storeSet('weeklyGoal',null);refreshUltraDashboard();toast('주간 목표를 삭제했어요.');return true;}
+    case '/포모도로': {startFocusTimer(parseInt(args)||25);return true;}
+    case '/집중상태': {const st=focusState();await postBotReply(st&&st.endAt>Date.now()?`🎯 집중 중 — ${fmtDuration(st.endAt-Date.now())} 남음`:'🎯 실행 중인 집중 타이머가 없어요.');return true;}
+    case '/집중취소': {stopFocusTimer();refreshUltraDashboard();return true;}
+    case '/스톱워치': {let st=stopwatchState();const a=args.toLowerCase();if(a==='시작'){if(!st.running){st.running=true;st.startAt=Date.now();storeSet('stopwatch',st);}toast('⏱ 스톱워치 시작');}else if(a==='정지'){if(st.running){st.elapsed=stopwatchElapsed(st);st.running=false;st.startAt=0;storeSet('stopwatch',st);}toast(`⏱ ${fmtDuration(st.elapsed)}`);}else if(a==='초기화'){storeSet('stopwatch',{running:false,startAt:0,elapsed:0});toast('⏱ 스톱워치를 초기화했어요.');}else await postBotReply(`⏱ 스톱워치: ${fmtDuration(stopwatchElapsed(st))} ${st.running?'(실행 중)':'(정지)'}`);return true;}
+    case '/체크인': {if(!args){toast('사용법: /체크인 오늘 한 일');return true;}const a=checkins();a.unshift({text:args,at:Date.now()});storeSet('checkins',a.slice(0,100));toast('✅ 체크인을 기록했어요.');return true;}
+    case '/체크인목록': {const a=checkins().slice(0,15);openModal(`<h3>✅ 최근 체크인</h3>${a.map((x,i)=>`<div class="day-evt-row"><div><b>${i+1}. ${escapeHtml(x.text)}</b><div class="meta">${fullDateTime(x.at)}</div></div></div>`).join('')||'<div class="dd-empty">기록이 없습니다.</div>'}`);return true;}
+    case '/오늘요약': {const d=await rawWeekStats(weekIdOf(new Date())),me=myRawWeekScore(d),g=currentGoal(),td=todos().filter(x=>!x.done),st=focusState();await postBotReply(`🧭 오늘의 NEXTBOT 요약\nMVP 점수: ${me.score}점 (💬${me.msgCount} / ❤️${me.reactCount})\n미완료 할 일: ${td.length}개\n주간 목표: ${g?(g.done?'✅ ':'🎯 ')+g.text:'없음'}\n집중 타이머: ${st&&st.endAt>Date.now()?fmtDuration(st.endAt-Date.now())+' 남음':'꺼짐'}`);return true;}
+    case '/개인백업': {const pack={exportedAt:new Date().toISOString(),uid:currentUser.uid,todos:todos(),notes:notes(),bookmarks:getBookmarks(),favorites:favorites(),ui:uiSettings(),drafts:storeGet('drafts',{}),weeklyGoal:storeGet('weeklyGoal',null),checkins:checkins(),stopwatch:stopwatchState()};downloadJson(`nextbot-personal-backup-${new Date().toISOString().slice(0,10)}.json`,pack);toast('개인 데이터를 백업했어요.');return true;}
+    case '/초안목록': {const d=storeGet('drafts',{}),rows=Object.entries(d).filter(([,v])=>String(v).trim()).map(([id,v])=>({id,v,ch:channels.find(c=>c.id===id)}));openModal(`<h3>✍️ 저장된 초안</h3>${rows.map((x,i)=>`<div class="day-evt-row"><div><b>${i+1}. #${escapeHtml(x.ch?.name||x.id)}</b><div class="meta">${escapeHtml(String(x.v).slice(0,100))}</div></div></div>`).join('')||'<div class="dd-empty">저장된 초안이 없습니다.</div>'}`);return true;}
+    case '/초안삭제': {if(!currentChannelId){toast('채널에서 사용해주세요.');return true;}clearChannelDraft(currentChannelId);msgInput.value='';msgInput.style.height='auto';$('sendBtn').disabled=true;toast('현재 채널 초안을 삭제했어요.');return true;}
+    case '/검색': {if(!currentChannelId||FEATURE_CHANNELS[currentChannelId]){toast('일반 채팅 채널에서 사용해주세요.');return true;}$('searchBox').classList.remove('hidden');$('searchBtn').classList.add('hidden');$('searchInput').value=args;$('searchInput').focus();applySearchFilter();return true;}
+    case '/채널이동': {const t=args.replace(/^#/,'').trim().toLowerCase();const c=channels.find(c=>canSeeChannel(c)&&c.name&&c.name.toLowerCase()===t)||channels.find(c=>canSeeChannel(c)&&c.name&&c.name.toLowerCase().includes(t));if(!c){toast('채널을 찾지 못했어요.');return true;}const cat=categories.find(x=>x.id===c.categoryId);openChannel(c.id,c.name,cat?.name||'');return true;}
+    case '/맨아래': {const l=$('msgList');if(l)l.scrollTo({top:l.scrollHeight,behavior:'smooth'});return true;}
+    case '/문자수': {await postBotReply(`🔠 문자 수: ${args.length}자 · 공백 제외: ${args.replace(/\s/g,'').length}자`);return true;}
+    case '/단어수': {const n=args.trim()?args.trim().split(/\s+/).length:0;await postBotReply(`📝 단어 수: ${n}개`);return true;}
+    case '/평균': {const a=numericList(args);if(!a.length){toast('숫자를 입력해주세요.');return true;}await postBotReply(`📐 평균: ${a.reduce((x,y)=>x+y,0)/a.length}`);return true;}
+    case '/중앙값': {const a=numericList(args).sort((x,y)=>x-y);if(!a.length){toast('숫자를 입력해주세요.');return true;}const m=Math.floor(a.length/2),v=a.length%2?a[m]:(a[m-1]+a[m])/2;await postBotReply(`📏 중앙값: ${v}`);return true;}
+    case '/퍼센트': {const [p,w]=args.split('|').map(Number);if(!Number.isFinite(p)||!Number.isFinite(w)||w===0){toast('사용법: /퍼센트 25|200');return true;}await postBotReply(`📊 ${p} / ${w} = ${(p/w*100).toFixed(2)}%`);return true;}
+    case '/셔플': {const a=args.split('|').map(x=>x.trim()).filter(Boolean);if(a.length<2){toast('사용법: /셔플 A|B|C');return true;}await postBotReply('🔀 '+shuffleCopy(a).join(' → '));return true;}
+    case '/알림권한': {if(!('Notification' in window)){toast('이 브라우저는 알림을 지원하지 않아요.');return true;}const p=await Notification.requestPermission();toast(`브라우저 알림 권한: ${p}`);return true;}
+  }
+  return false;
+}
+
+$('focusPill').onclick=()=>{const st=focusState();if(st&&st.endAt>Date.now())openModal(`<h3>🎯 집중 타이머</h3><div style="font-family:var(--font-display);font-size:34px;font-weight:700;text-align:center;padding:14px 0;">${escapeHtml(fmtDuration(st.endAt-Date.now()))}</div><div class="modal-actions"><button class="btn btn-danger" id="focusModalCancel">집중 취소</button></div>`);if($('focusModalCancel'))$('focusModalCancel').onclick=()=>{closeModal();stopFocusTimer();refreshUltraDashboard();};};
+armFocusTimer();refreshFocusPill();
+
 // UI wiring for extra features
 $('favChanBtn').onclick=toggleFavoriteChannel;
 $('toolsBtn').onclick=openToolsModal;
@@ -2241,6 +2527,7 @@ async function handleSlashCommand(raw){
   const cmd = (spaceIdx===-1 ? trimmed : trimmed.slice(0,spaceIdx)).toLowerCase();
   const args = spaceIdx===-1 ? '' : trimmed.slice(spaceIdx+1).trim();
   try{
+    if(await handleUltraCommand(cmd,args)) return;
     if(await handleMegaCommand(cmd,args)) return;
     switch(cmd){
       case '/help': case '/도움말': case '/명령어':
@@ -2856,6 +3143,11 @@ function renderNotifDropdown(){
         <div><div>📅 ${escapeHtml(n.text||'')}</div></div>
       </div>`;
     }
+    if(n.kind==='admin'){
+      return `<div class="notif-item ${n.read?'':'unread'}" data-nid="${n.id}" data-chan="${n.channelId||BOT_CHANNEL_ID}">
+        <div><div>📢 <b>관리자 방송</b></div><div class="notif-meta">${escapeHtml((n.text||'').slice(0,160))}</div></div>
+      </div>`;
+    }
     return `<div class="notif-item ${n.read?'':'unread'}" data-nid="${n.id}" data-chan="${n.channelId}">
       <div><div>🔔 <b>${escapeHtml(n.fromNickname)}</b>님이 #${escapeHtml(n.channelName||'')}에서 멘션했습니다</div>
       <div class="notif-meta">${escapeHtml((n.text||'').slice(0,60))}</div></div>
@@ -2907,153 +3199,601 @@ $('logoutBtn').onclick=async ()=>{
   await signOut(auth);
 };
 
-/* ---------------- Admin ---------------- */
+
+/* ---------------- Admin 50 Control Center ---------------- */
 $('navAdmin').onclick=()=>{ closeDrawer(); openAdminModal(); };
+
+const ADMIN50_FEATURES = [
+  '실시간 KPI','온라인 인원','비활성 계정 수','관리자 수','카테고리 수','채널 수','주간 메시지 수','주간 리액션 수','MVP TOP3','새로고침',
+  '사용자 검색','역할 필터','상태 필터','정렬','다중 선택','전체 선택','일괄 활성화','일괄 비활성화','역할 일괄 추가','역할 일괄 제거',
+  '기본 팀원 역할 초기화','사용자 CSV','UID 복사','이메일 복사','비밀번호 재설정','닉네임 강제 변경','연락 이메일 수정','역할 편집','관리자 승격/해제','접속/LastSeen 확인',
+  '사용자 주간 점수 확인','사용자 점수 초기화','카테고리 생성','카테고리 이름 변경','카테고리 순서 이동','카테고리 삭제','채널 생성','채널 이름 변경','채널 순서 이동','채널 카테고리 이동',
+  '채널 접근 역할','채널 잠금','채널 보관','채널 설명','채널 메시지 비우기','채널 JSON 내보내기','공지/일정 편집·삭제','메시지 검열','전체 방송','MVP 수동 관리',
+  'Firebase 상태 점검','관리자 백업','감사 로그'
+];
+let admin50SelectedUsers = new Set();
+let admin50Tab = 'overview';
+
 function openAdminModal(){
+  if(!myDoc || !myDoc.isAdmin){ toast('관리자만 사용할 수 있습니다.'); return; }
   openModal(`
-    <h3>관리자 페이지</h3>
-    <div class="admin-tabs">
-      <div class="admin-tab active" data-tab="users">사용자 관리</div>
-      <div class="admin-tab" data-tab="announce">공지 작성</div>
-      <div class="admin-tab" data-tab="event">일정 관리</div>
+    <h3>🛡 NEXTBOT 관리자 콘솔 <span class="admin50-badge">ADMIN 50</span></h3>
+    <div class="admin50-tabs">
+      <button class="admin50-tab active" data-a50tab="overview">개요</button>
+      <button class="admin50-tab" data-a50tab="users">사용자</button>
+      <button class="admin50-tab" data-a50tab="structure">채널·카테고리</button>
+      <button class="admin50-tab" data-a50tab="content">공지·일정</button>
+      <button class="admin50-tab" data-a50tab="moderation">메시지 관리</button>
+      <button class="admin50-tab" data-a50tab="mvp">MVP</button>
+      <button class="admin50-tab" data-a50tab="system">시스템</button>
+      <button class="admin50-tab" data-a50tab="audit">감사 로그</button>
     </div>
     <div id="adminBody"></div>
   `, true);
-  document.querySelectorAll('.admin-tab').forEach(t=>t.onclick=()=>{
-    document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active'); renderAdminTab(t.getAttribute('data-tab'));
+  document.querySelectorAll('[data-a50tab]').forEach(t=>t.onclick=()=>{
+    document.querySelectorAll('[data-a50tab]').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    admin50Tab=t.getAttribute('data-a50tab');
+    renderAdminTab(admin50Tab);
   });
-  renderAdminTab('users');
+  admin50Tab='overview';
+  renderAdminTab('overview');
 }
-function renderAdminTab(tab){
+
+function a50Ts(v){
+  if(!v) return 0;
+  if(typeof v==='number') return v;
+  if(v.toMillis) return v.toMillis();
+  if(v.seconds) return v.seconds*1000;
+  return 0;
+}
+function a50Date(v){
+  const n=a50Ts(v);
+  return n ? new Date(n).toLocaleString('ko-KR') : '-';
+}
+function a50Csv(s){
+  const x=String(s??'');
+  return /[",\n]/.test(x) ? `"${x.replace(/"/g,'""')}"` : x;
+}
+function a50Download(name, content, type='text/plain'){
+  const blob=new Blob([content],{type});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+async function a50Copy(s){
+  try{ await navigator.clipboard.writeText(String(s||'')); toast('복사했습니다.'); }
+  catch(e){ toast('복사에 실패했습니다.'); }
+}
+async function auditAdmin(action,target='',detail=''){
+  if(!currentUser || !myDoc?.isAdmin) return;
+  try{
+    await addDoc(collection(db,'admin_logs'),{
+      action,target,detail:String(detail||'').slice(0,500),
+      adminUid:currentUser.uid,adminNickname:myDoc.nickname||'관리자',
+      createdAt:serverTimestamp()
+    });
+  }catch(e){ console.warn('admin audit write failed',e); }
+}
+async function a50GetWeekData(weekId=weekIdOf(new Date())){
+  const s=await getDoc(doc(db,'stats',weekId));
+  return s.exists()?s.data():{};
+}
+function a50WeekTotals(data){
+  return {
+    msg:Object.values(data.msgCount||{}).reduce((a,b)=>a+(Number(b)||0),0),
+    react:Object.values(data.reactCount||{}).reduce((a,b)=>a+(Number(b)||0),0)
+  };
+}
+function a50VisibleUsers(){
+  return Object.values(usersMap).filter(u=>u && !u.isBot && u.uid!=='BOT');
+}
+
+async function renderAdminTab(tab){
   const body=$('adminBody');
-  if(tab==='users'){
-    body.innerHTML = `
-      <div class="field" style="margin-bottom:12px;"><input type="text" id="adminUserSearch" placeholder="닉네임 또는 이메일로 검색..." style="width:100%; background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:9px 11px; font-size:13px; color:var(--text);"></div>
-      <div id="adminUserList"></div>
-    `;
-    renderAdminUserList('');
-    $('adminUserSearch').addEventListener('input', (e)=>renderAdminUserList(e.target.value.trim().toLowerCase()));
-  } else if(tab==='announce'){
-    body.innerHTML=`
-      <div class="field"><label>공지 제목</label><input type="text" id="anTitle"></div>
-      <div class="field"><label>내용</label><textarea class="field-ta" id="anBody"></textarea></div>
-      <button class="btn btn-primary" style="width:auto;" id="anSave">공지 게시</button>
-      <div style="margin-top:16px;" id="anList"></div>`;
-    $('anSave').onclick=async ()=>{
-      const title=$('anTitle').value.trim(), content=$('anBody').value.trim();
-      if(!title) return;
-      await addDoc(collection(db,'announcements'), { title, content, createdAt:serverTimestamp(), authorId:currentUser.uid });
-      $('anTitle').value=''; $('anBody').value=''; toast('공지가 게시되었습니다.');
-      sendBotMessage(BOT_CHANNEL_ID, `📢 새 공지가 등록됐어요: "${title}" (작성자: ${myDoc.nickname})`);
-    };
-  } else if(tab==='event'){
-    body.innerHTML=`
-      <div class="field"><label>일정 이름</label><input type="text" id="evTitle"></div>
-      <div class="field"><label>날짜</label><input type="date" id="evDate"></div>
-      <button class="btn btn-primary" style="width:auto;" id="evSave">일정 추가</button>`;
-    $('evSave').onclick=async ()=>{
-      const title=$('evTitle').value.trim(), date=$('evDate').value;
-      if(!title||!date) return;
-      await addDoc(collection(db,'events'), { title, date, createdAt:serverTimestamp() });
-      $('evTitle').value=''; $('evDate').value=''; toast('일정이 추가되었습니다.');
-      sendBotMessage(BOT_CHANNEL_ID, `🗓 새 일정이 추가됐어요: "${title}" (${date})`);
-    };
+  if(!body) return;
+  body.innerHTML='<div class="empty" style="padding:18px 0;">불러오는 중...</div>';
+  try{
+    if(tab==='overview') return await renderAdminOverview();
+    if(tab==='users') return renderAdminUsers();
+    if(tab==='structure') return renderAdminStructure();
+    if(tab==='content') return await renderAdminContent();
+    if(tab==='moderation') return renderAdminModeration();
+    if(tab==='mvp') return await renderAdminMvp();
+    if(tab==='system') return await renderAdminSystem();
+    if(tab==='audit') return await renderAdminAudit();
+  }catch(e){
+    console.error('admin tab error',e);
+    body.innerHTML=`<div class="admin50-card admin50-danger">오류: ${escapeHtml(e.message||String(e))}</div>`;
   }
 }
 
-function renderAdminUserList(term){
-  const box=$('adminUserList');
-  if(!box) return;
-  const list = Object.values(usersMap).filter(u=>{
-    if(!term) return true;
-    return (u.nickname||'').toLowerCase().includes(term) || (u.email||'').toLowerCase().includes(term);
-  }).sort((a,b)=>(a.nickname||'').localeCompare(b.nickname||''));
-  if(!list.length){ box.innerHTML='<div class="empty" style="padding:10px 0;">일치하는 사용자가 없습니다</div>'; return; }
-  box.innerHTML = list.map(u=>`
-    <div class="admin-userrow">
-      ${avatarHtml(u,30)}
-      <div class="nm">
-        <div class="n">${escapeHtml(u.nickname)} ${u.isAdmin?'👑':''} ${u.disabled?'<span class="pill fail">비활성화됨</span>':''}</div>
-        <div class="e">${escapeHtml(u.email)}</div>
-      </div>
-      <button class="btn btn-sm" data-manage="${u.uid}">계정 관리</button>
+async function renderAdminOverview(){
+  const body=$('adminBody');
+  const users=a50VisibleUsers();
+  const week=weekIdOf(new Date());
+  const stats=await a50GetWeekData(week);
+  const totals=a50WeekTotals(stats);
+  const ranking=await computeRanking(week);
+  const online=users.filter(u=>presenceData[u.uid]?.state==='online').length;
+  const disabled=users.filter(u=>u.disabled).length;
+  const admins=users.filter(u=>u.isAdmin).length;
+  body.innerHTML=`
+    <div class="admin50-grid">
+      <div class="admin50-stat"><div class="v">${users.length}</div><div class="k">전체 사용자</div></div>
+      <div class="admin50-stat"><div class="v">${online}</div><div class="k">온라인</div></div>
+      <div class="admin50-stat"><div class="v">${disabled}</div><div class="k">비활성 계정</div></div>
+      <div class="admin50-stat"><div class="v">${admins}</div><div class="k">관리자</div></div>
+      <div class="admin50-stat"><div class="v">${categories.length}</div><div class="k">카테고리</div></div>
+      <div class="admin50-stat"><div class="v">${channels.length}</div><div class="k">채널</div></div>
+      <div class="admin50-stat"><div class="v">${totals.msg}</div><div class="k">이번 주 메시지 점수</div></div>
+      <div class="admin50-stat"><div class="v">${totals.react}</div><div class="k">이번 주 받은 리액션</div></div>
     </div>
-  `).join('');
-  box.querySelectorAll('[data-manage]').forEach(btn=>btn.onclick=()=>openUserManageModal(btn.getAttribute('data-manage')));
+    <div class="admin50-toolbar">
+      <button class="btn btn-sm" id="a50Refresh">↻ 전체 새로고침</button>
+      <button class="btn btn-sm" id="a50OpenUsers">사용자 관리</button>
+      <button class="btn btn-sm" id="a50OpenStruct">채널 관리</button>
+      <button class="btn btn-sm" id="a50OpenMvp">MVP 관리</button>
+    </div>
+    <div class="admin50-card">
+      <h4>🏆 이번 주 MVP TOP3</h4>
+      ${ranking.length?ranking.slice(0,3).map((r,i)=>`<div class="day-evt-row"><b>${i+1}. ${escapeHtml(r.nickname)}</b><span style="margin-left:auto">${r.score}점 · 💬${r.msgCount} · 👍${r.reactCount}</span></div>`).join(''):'<div class="empty">아직 집계된 활동이 없습니다.</div>'}
+    </div>
+    <div class="admin50-card">
+      <h4>ADMIN 50 기능</h4>
+      <div>${ADMIN50_FEATURES.map((x,i)=>`<span class="admin50-feature-chip">${i+1}. ${escapeHtml(x)}</span>`).join('')}</div>
+    </div>`;
+  $('a50Refresh').onclick=()=>renderAdminOverview();
+  $('a50OpenUsers').onclick=()=>a50SwitchTab('users');
+  $('a50OpenStruct').onclick=()=>a50SwitchTab('structure');
+  $('a50OpenMvp').onclick=()=>a50SwitchTab('mvp');
+}
+function a50SwitchTab(tab){
+  document.querySelectorAll('[data-a50tab]').forEach(x=>x.classList.toggle('active',x.getAttribute('data-a50tab')===tab));
+  admin50Tab=tab; renderAdminTab(tab);
 }
 
-function openUserManageModal(uid){
-  const u = usersMap[uid];
-  if(!u) return;
-  openModal(`
-    <h3>계정 관리 — ${escapeHtml(u.nickname||'')}</h3>
-
-    <div class="field"><label>닉네임 (강제 변경)</label><input type="text" id="mgNick" value="${escapeHtml(u.nickname||'')}"></div>
-
-    <div class="field">
-      <label>직급 (강제 변경) — 여러 개 선택 가능</label>
-      <div class="chip-select" id="mgRoleChips">
-        ${Object.entries(ROLE_DEFS).map(([k,v])=>`<div class="chip-opt ${((u.roles||[]).includes(k))?'on':''}" data-role="${k}">${v.label}</div>`).join('')}
-      </div>
+/* ----- users ----- */
+function renderAdminUsers(){
+  const body=$('adminBody');
+  body.innerHTML=`
+    <div class="admin50-toolbar">
+      <input id="a50UserSearch" placeholder="닉네임 / 이메일 / UID 검색">
+      <select id="a50RoleFilter"><option value="">모든 역할</option>${Object.entries(ROLE_DEFS).filter(([k])=>k!=='bot').map(([k,v])=>`<option value="${k}">${escapeHtml(v.short)}</option>`).join('')}</select>
+      <select id="a50StateFilter"><option value="">모든 상태</option><option value="online">온라인</option><option value="offline">오프라인</option><option value="disabled">비활성</option><option value="admin">관리자</option></select>
+      <select id="a50UserSort"><option value="name">닉네임순</option><option value="online">온라인 우선</option><option value="disabled">비활성 우선</option><option value="recent">최근 접속순</option></select>
     </div>
-
-    <div class="field"><label>연락용 이메일 (표시용 — 로그인 이메일과 별개)</label><input type="text" id="mgContactEmail" value="${escapeHtml(u.contactEmail||'')}" placeholder="예: parent@example.com"></div>
-
-    <div class="field" style="background:var(--panel-2); border:1px solid var(--border-soft); border-radius:8px; padding:10px 12px; font-size:11.5px; color:var(--text-faint); line-height:1.6;">
-      🔒 로그인 이메일(<b style="color:var(--text-dim);">${escapeHtml(u.email||'')}</b>)과 비밀번호는 보안상 Firebase 클라이언트에서 관리자가 직접 바꿀 수 없습니다.
-      아래 버튼으로 <b style="color:var(--text-dim);">비밀번호 재설정 메일</b>을 보내면, 본인이 메일의 링크로 새 비밀번호를 설정할 수 있어요.
+    <div class="admin50-toolbar">
+      <button class="btn btn-sm" id="a50SelectAll">전체 선택</button>
+      <button class="btn btn-sm" id="a50BulkEnable">일괄 활성화</button>
+      <button class="btn btn-sm admin50-danger" id="a50BulkDisable">일괄 비활성화</button>
+      <select id="a50BulkRole">${Object.entries(ROLE_DEFS).filter(([k])=>k!=='bot').map(([k,v])=>`<option value="${k}">${escapeHtml(v.short)}</option>`).join('')}</select>
+      <button class="btn btn-sm" id="a50BulkAddRole">역할 +</button>
+      <button class="btn btn-sm" id="a50BulkRemoveRole">역할 −</button>
+      <button class="btn btn-sm" id="a50BulkMember">팀원으로 초기화</button>
+      <button class="btn btn-sm" id="a50ExportUsers">CSV</button>
     </div>
-    <button class="btn btn-sm" id="mgResetPw" style="width:100%; margin-bottom:14px;">📧 비밀번호 재설정 메일 발송</button>
-
-    <div class="field">
-      <label>계정 상태</label>
-      <div class="chip-select">
-        <div class="chip-opt ${!u.disabled?'on':''}" id="mgEnable">활성화</div>
-        <div class="chip-opt ${u.disabled?'on':''}" id="mgDisable" style="${u.disabled?'border-color:var(--danger); color:var(--danger); background:rgba(255,92,92,.1);':''}">비활성화 (로그인 차단)</div>
-      </div>
-    </div>
-
-    <div class="modal-actions"><button class="btn" id="mgCancel">취소</button><button class="btn btn-primary" id="mgSave" style="width:auto;">저장</button></div>
-  `, true);
-
-  const roleSel = new Set(u.roles||[]);
-  document.querySelectorAll('#mgRoleChips .chip-opt').forEach(chip=>chip.onclick=()=>{
-    const r=chip.getAttribute('data-role');
-    if(roleSel.has(r)){ roleSel.delete(r); chip.classList.remove('on'); } else { roleSel.add(r); chip.classList.add('on'); }
+    <div class="admin50-muted" id="a50SelectedInfo">선택 0명</div>
+    <div id="a50UserList" style="margin-top:8px;"></div>`;
+  const rerender=()=>a50RenderUserRows();
+  ['a50UserSearch','a50RoleFilter','a50StateFilter','a50UserSort'].forEach(id=>$(id).addEventListener(id==='a50UserSearch'?'input':'change',rerender));
+  $('a50SelectAll').onclick=()=>{ a50FilteredUsers().forEach(u=>admin50SelectedUsers.add(u.uid)); a50RenderUserRows(); };
+  $('a50BulkEnable').onclick=()=>a50BulkUserUpdate('enable');
+  $('a50BulkDisable').onclick=()=>a50BulkUserUpdate('disable');
+  $('a50BulkAddRole').onclick=()=>a50BulkUserUpdate('addRole',$('a50BulkRole').value);
+  $('a50BulkRemoveRole').onclick=()=>a50BulkUserUpdate('removeRole',$('a50BulkRole').value);
+  $('a50BulkMember').onclick=()=>a50BulkUserUpdate('member');
+  $('a50ExportUsers').onclick=a50ExportUsersCsv;
+  a50RenderUserRows();
+}
+function a50FilteredUsers(){
+  const term=($('a50UserSearch')?.value||'').trim().toLowerCase();
+  const role=$('a50RoleFilter')?.value||'';
+  const state=$('a50StateFilter')?.value||'';
+  const sort=$('a50UserSort')?.value||'name';
+  let arr=a50VisibleUsers().filter(u=>{
+    const hit=!term || [u.nickname,u.email,u.uid,u.contactEmail].some(v=>String(v||'').toLowerCase().includes(term));
+    const roleHit=!role || (u.roles||[]).includes(role);
+    let stateHit=true;
+    if(state==='online') stateHit=presenceData[u.uid]?.state==='online';
+    if(state==='offline') stateHit=presenceData[u.uid]?.state!=='online';
+    if(state==='disabled') stateHit=!!u.disabled;
+    if(state==='admin') stateHit=!!u.isAdmin;
+    return hit&&roleHit&&stateHit;
   });
+  arr.sort((a,b)=>{
+    if(sort==='online') return Number(presenceData[b.uid]?.state==='online')-Number(presenceData[a.uid]?.state==='online') || (a.nickname||'').localeCompare(b.nickname||'');
+    if(sort==='disabled') return Number(!!b.disabled)-Number(!!a.disabled) || (a.nickname||'').localeCompare(b.nickname||'');
+    if(sort==='recent') return a50Ts(b.lastSeen)-a50Ts(a.lastSeen);
+    return (a.nickname||'').localeCompare(b.nickname||'');
+  });
+  return arr;
+}
+function a50RenderUserRows(){
+  const box=$('a50UserList'); if(!box) return;
+  const arr=a50FilteredUsers();
+  $('a50SelectedInfo').textContent=`선택 ${admin50SelectedUsers.size}명 · 표시 ${arr.length}명`;
+  box.innerHTML=arr.length?`<table class="admin50-table"><thead><tr><th></th><th>사용자</th><th>역할</th><th>상태</th><th>최근 접속</th><th>관리</th></tr></thead><tbody>${arr.map(u=>{
+    const online=presenceData[u.uid]?.state==='online';
+    return `<tr>
+      <td><input class="admin50-check" type="checkbox" data-a50sel="${u.uid}" ${admin50SelectedUsers.has(u.uid)?'checked':''}></td>
+      <td><b>${escapeHtml(u.nickname||'?')}</b><div class="admin50-muted">${escapeHtml(u.email||'')}<br>${escapeHtml(u.uid)}</div></td>
+      <td>${escapeHtml(rolesLabel(u.roles))}${u.isAdmin?' · 👑':''}</td>
+      <td>${u.disabled?'<span class="pill fail">비활성</span>':online?'<span class="pill ok">온라인</span>':'오프라인'}</td>
+      <td>${escapeHtml(a50Date(u.lastSeen))}</td>
+      <td class="actions"><button class="btn btn-sm" data-a50manage="${u.uid}">상세</button><button class="btn btn-sm" data-a50uid="${u.uid}">UID</button><button class="btn btn-sm" data-a50mail="${u.uid}">메일</button></td>
+    </tr>`}).join('')}</tbody></table>`:'<div class="empty">조건에 맞는 사용자가 없습니다.</div>';
+  box.querySelectorAll('[data-a50sel]').forEach(el=>el.onchange=()=>{
+    const uid=el.getAttribute('data-a50sel'); el.checked?admin50SelectedUsers.add(uid):admin50SelectedUsers.delete(uid); $('a50SelectedInfo').textContent=`선택 ${admin50SelectedUsers.size}명 · 표시 ${arr.length}명`;
+  });
+  box.querySelectorAll('[data-a50manage]').forEach(el=>el.onclick=()=>openUserManageModal(el.getAttribute('data-a50manage')));
+  box.querySelectorAll('[data-a50uid]').forEach(el=>el.onclick=()=>a50Copy(el.getAttribute('data-a50uid')));
+  box.querySelectorAll('[data-a50mail]').forEach(el=>el.onclick=()=>{const u=usersMap[el.getAttribute('data-a50mail')];a50Copy(u?.email||'');});
+}
+async function a50BulkUserUpdate(mode,role){
+  const ids=[...admin50SelectedUsers].filter(uid=>uid!==currentUser.uid || mode!=='disable');
+  if(!ids.length){ toast('사용자를 먼저 선택하세요.'); return; }
+  if((mode==='disable'||mode==='member')&&!confirm(`${ids.length}명에게 이 작업을 적용할까요?`)) return;
+  for(const uid of ids){
+    const u=usersMap[uid]; if(!u) continue;
+    let data={};
+    if(mode==='enable') data.disabled=false;
+    if(mode==='disable') data.disabled=true;
+    if(mode==='member') data.roles=['member'];
+    if(mode==='addRole') data.roles=Array.from(new Set([...(u.roles||['member']),role]));
+    if(mode==='removeRole'){
+      let roles=(u.roles||[]).filter(r=>r!==role); if(!roles.length) roles=['member']; data.roles=roles;
+    }
+    await updateDoc(doc(db,'users',uid),data);
+  }
+  await auditAdmin('bulk-user-'+mode,`${ids.length} users`,role||'');
+  toast(`${ids.length}명 처리 완료`);
+  admin50SelectedUsers.clear();
+  setTimeout(()=>renderAdminUsers(),250);
+}
+function a50ExportUsersCsv(){
+  const rows=[['UID','닉네임','로그인 이메일','연락 이메일','역할','관리자','비활성','최근접속']];
+  a50VisibleUsers().forEach(u=>rows.push([u.uid,u.nickname,u.email,u.contactEmail,(u.roles||[]).join('|'),u.isAdmin,u.disabled,a50Date(u.lastSeen)]));
+  a50Download(`nextbot_users_${new Date().toISOString().slice(0,10)}.csv`,rows.map(r=>r.map(a50Csv).join(',')).join('\n'),'text/csv;charset=utf-8');
+  auditAdmin('export-users');
+}
 
-  let disabledState = !!u.disabled;
-  $('mgEnable').onclick=()=>{ disabledState=false; $('mgEnable').classList.add('on'); $('mgDisable').classList.remove('on'); $('mgDisable').style=''; };
-  $('mgDisable').onclick=()=>{ disabledState=true; $('mgDisable').classList.add('on'); $('mgDisable').style='border-color:var(--danger); color:var(--danger); background:rgba(255,92,92,.1);'; $('mgEnable').classList.remove('on'); };
-
-  $('mgResetPw').onclick=async ()=>{
-    if(!u.email){ toast('이 계정에 등록된 이메일이 없습니다.'); return; }
-    try{ await sendPasswordResetEmail(auth, u.email); toast(`${u.email} 로 재설정 메일을 보냈습니다.`); }
-    catch(e){ toast('메일 발송 실패: '+translateAuthErr(e)); }
+async function openUserManageModal(uid){
+  const u=usersMap[uid]; if(!u||u.isBot) return;
+  let stats={};
+  try{stats=await a50GetWeekData();}catch(e){}
+  const m=Number(stats.msgCount?.[uid]||0), r=Number(stats.reactCount?.[uid]||0);
+  openModal(`
+    <h3>👤 계정 관리 — ${escapeHtml(u.nickname||'')}</h3>
+    <div class="admin50-grid">
+      <div class="admin50-stat"><div class="v">${m}</div><div class="k">이번 주 메시지</div></div>
+      <div class="admin50-stat"><div class="v">${r}</div><div class="k">받은 리액션</div></div>
+      <div class="admin50-stat"><div class="v">${m*MVP_MSG_WEIGHT+r*MVP_REACT_WEIGHT}</div><div class="k">MVP 점수</div></div>
+      <div class="admin50-stat"><div class="v">${presenceData[uid]?.state==='online'?'ON':'OFF'}</div><div class="k">접속 상태</div></div>
+    </div>
+    <div class="field"><label>UID</label><div class="admin50-toolbar"><input id="mgUid" value="${escapeHtml(uid)}" readonly><button class="btn btn-sm" id="mgCopyUid">복사</button></div></div>
+    <div class="field"><label>로그인 이메일</label><div class="admin50-toolbar"><input value="${escapeHtml(u.email||'')}" readonly><button class="btn btn-sm" id="mgCopyMail">복사</button></div></div>
+    <div class="field"><label>닉네임 강제 변경</label><input type="text" id="mgNick" value="${escapeHtml(u.nickname||'')}"></div>
+    <div class="field"><label>연락용 이메일</label><input type="text" id="mgContactEmail" value="${escapeHtml(u.contactEmail||'')}"></div>
+    <div class="field"><label>역할</label><div class="chip-select" id="mgRoleChips">${Object.entries(ROLE_DEFS).filter(([k])=>k!=='bot').map(([k,v])=>`<div class="chip-opt ${((u.roles||[]).includes(k))?'on':''}" data-role="${k}">${v.label}</div>`).join('')}</div></div>
+    <div class="field"><label>계정 상태</label><div class="chip-select"><div class="chip-opt ${!u.disabled?'on':''}" id="mgEnable">활성화</div><div class="chip-opt ${u.disabled?'on':''}" id="mgDisable">비활성화</div></div></div>
+    <div class="field"><label>관리자 권한</label><div class="chip-select"><div class="chip-opt ${u.isAdmin?'on':''}" id="mgAdminToggle">${u.isAdmin?'👑 관리자':'일반 사용자'}</div></div></div>
+    <div class="admin50-muted">최근 접속: ${escapeHtml(a50Date(u.lastSeen))}</div>
+    <div class="admin50-toolbar" style="margin-top:12px">
+      <button class="btn btn-sm" id="mgResetPw">📧 비밀번호 재설정</button>
+      <button class="btn btn-sm admin50-danger" id="mgResetStats">이번 주 점수 0으로</button>
+    </div>
+    <div class="modal-actions"><button class="btn" id="mgCancel">취소</button><button class="btn btn-primary" id="mgSave" style="width:auto">저장</button></div>
+  `,true);
+  const roleSel=new Set(u.roles||[]);
+  document.querySelectorAll('#mgRoleChips .chip-opt').forEach(chip=>chip.onclick=()=>{const r=chip.dataset.role;roleSel.has(r)?roleSel.delete(r):roleSel.add(r);chip.classList.toggle('on',roleSel.has(r));});
+  let disabledState=!!u.disabled, adminState=!!u.isAdmin;
+  const paintState=()=>{ $('mgEnable').classList.toggle('on',!disabledState);$('mgDisable').classList.toggle('on',disabledState);$('mgAdminToggle').classList.toggle('on',adminState);$('mgAdminToggle').textContent=adminState?'👑 관리자':'일반 사용자'; };
+  $('mgEnable').onclick=()=>{disabledState=false;paintState();};
+  $('mgDisable').onclick=()=>{if(uid===currentUser.uid){toast('자기 계정은 비활성화할 수 없습니다.');return;}disabledState=true;paintState();};
+  $('mgAdminToggle').onclick=()=>{if(uid===currentUser.uid&&adminState){toast('현재 로그인한 자기 관리자 권한은 해제하지 않도록 막았습니다.');return;}adminState=!adminState;paintState();};
+  $('mgCopyUid').onclick=()=>a50Copy(uid); $('mgCopyMail').onclick=()=>a50Copy(u.email||'');
+  $('mgResetPw').onclick=async()=>{try{await sendPasswordResetEmail(auth,u.email);toast('재설정 메일을 보냈습니다.');await auditAdmin('password-reset-mail',uid,u.email||'');}catch(e){toast('메일 발송 실패: '+translateAuthErr(e));}};
+  $('mgResetStats').onclick=async()=>{
+    if(!confirm('이 사용자의 이번 주 메시지/리액션 점수를 0으로 만들까요?'))return;
+    const wk=weekIdOf(new Date()), s=await a50GetWeekData(wk);
+    const mc={...(s.msgCount||{})}, rc={...(s.reactCount||{})}; mc[uid]=0; rc[uid]=0;
+    await setDoc(doc(db,'stats',wk),{weekId:wk,msgCount:mc,reactCount:rc,updatedAt:serverTimestamp()},{merge:true});
+    await auditAdmin('reset-user-stats',uid,wk); toast('점수를 초기화했습니다.'); closeModal();
   };
-
   $('mgCancel').onclick=closeModal;
-  $('mgSave').onclick=async ()=>{
-    const nick=$('mgNick').value.trim();
-    const contactEmail=$('mgContactEmail').value.trim();
-    if(!nick){ toast('닉네임을 입력해주세요.'); return; }
-    let roles = Array.from(roleSel); if(!roles.length) roles=['member'];
-    try{
-      const prevDisabled=!!u.disabled, prevRoles=(u.roles||[]).join(',');
-      await updateDoc(doc(db,'users',uid), { nickname:nick, roles, contactEmail, disabled: disabledState });
-      toast('계정 정보가 저장되었습니다.');
-      closeModal();
-      if(disabledState!==prevDisabled){
-        sendBotMessage(BOT_CHANNEL_ID, `⚙ ${myDoc.nickname}님이 ${nick}님 계정을 ${disabledState?'비활성화':'활성화'}했어요.`);
-      } else if(roles.join(',')!==prevRoles){
-        sendBotMessage(BOT_CHANNEL_ID, `⚙ ${myDoc.nickname}님이 ${nick}님의 직급을 변경했어요. (${rolesLabel(roles)})`);
-      }
-    }catch(e){ toast('저장 실패: '+e.message); }
+  $('mgSave').onclick=async()=>{
+    const nick=$('mgNick').value.trim(); if(!nick){toast('닉네임을 입력하세요.');return;}
+    let roles=[...roleSel];if(!roles.length)roles=['member'];
+    await updateDoc(doc(db,'users',uid),{nickname:nick,contactEmail:$('mgContactEmail').value.trim(),roles,disabled:disabledState,isAdmin:adminState});
+    await auditAdmin('update-user',uid,`nick=${nick}, roles=${roles.join('|')}, disabled=${disabledState}, admin=${adminState}`);
+    toast('계정을 저장했습니다.');closeModal();
   };
+}
+
+/* ----- structure ----- */
+function renderAdminStructure(){
+  const body=$('adminBody');
+  const cats=[...categories].sort((a,b)=>(a.position||0)-(b.position||0));
+  body.innerHTML=`
+    <div class="admin50-toolbar"><button class="btn btn-sm" id="a50NewCat">+ 카테고리</button><button class="btn btn-sm" id="a50NewChannel">+ 채널</button><button class="btn btn-sm" id="a50LockAll">🔒 전체 잠금</button><button class="btn btn-sm" id="a50UnlockAll">🔓 전체 잠금 해제</button></div>
+    <div id="a50StructList">${cats.map(cat=>a50CategoryHtml(cat)).join('')}</div>`;
+  $('a50NewCat').onclick=a50CreateCategory;
+  $('a50NewChannel').onclick=()=>a50CreateChannel();
+  $('a50LockAll').onclick=()=>a50SetAllLocked(true);
+  $('a50UnlockAll').onclick=()=>a50SetAllLocked(false);
+  a50BindStructureActions();
+}
+function a50CategoryHtml(cat){
+  const cs=channels.filter(c=>c.categoryId===cat.id).sort((a,b)=>(a.position||0)-(b.position||0));
+  return `<div class="admin50-cat">
+    <div class="admin50-cat-head"><b>${escapeHtml(cat.name)}</b><span class="admin50-badge">${cs.length}채널</span>
+      <button class="btn btn-sm" data-catup="${cat.id}">↑</button><button class="btn btn-sm" data-catdown="${cat.id}">↓</button>
+      <button class="btn btn-sm" data-catrename="${cat.id}">이름</button><button class="btn btn-sm admin50-danger" data-catdelete="${cat.id}">삭제</button>
+    </div>
+    ${cs.map(c=>`<div class="admin50-channel">
+      <div><b>#${escapeHtml(c.name)}</b> ${c.locked?'🔒':''} ${c.archived?'📦':''}<div class="admin50-muted">${escapeHtml(c.topic||'설명 없음')}</div></div>
+      <div class="admin50-muted">접근: ${(c.allowedRoles||[]).length?escapeHtml((c.allowedRoles||[]).map(r=>ROLE_DEFS[r]?.short||r).join(', ')):'전체'}</div>
+      <div class="actions">
+        <button class="btn btn-sm" data-chmanage="${c.id}">관리</button>
+        <button class="btn btn-sm" data-chup="${c.id}">↑</button><button class="btn btn-sm" data-chdown="${c.id}">↓</button>
+      </div>
+    </div>`).join('')||'<div class="admin50-muted">빈 카테고리</div>'}
+  </div>`;
+}
+function a50BindStructureActions(){
+  document.querySelectorAll('[data-catup]').forEach(b=>b.onclick=()=>a50MoveCategory(b.dataset.catup,-1));
+  document.querySelectorAll('[data-catdown]').forEach(b=>b.onclick=()=>a50MoveCategory(b.dataset.catdown,1));
+  document.querySelectorAll('[data-catrename]').forEach(b=>b.onclick=()=>a50RenameCategory(b.dataset.catrename));
+  document.querySelectorAll('[data-catdelete]').forEach(b=>b.onclick=()=>a50DeleteCategory(b.dataset.catdelete));
+  document.querySelectorAll('[data-chmanage]').forEach(b=>b.onclick=()=>a50ManageChannel(b.dataset.chmanage));
+  document.querySelectorAll('[data-chup]').forEach(b=>b.onclick=()=>a50MoveChannel(b.dataset.chup,-1));
+  document.querySelectorAll('[data-chdown]').forEach(b=>b.onclick=()=>a50MoveChannel(b.dataset.chdown,1));
+}
+async function a50CreateCategory(){
+  const name=prompt('새 카테고리 이름'); if(!name?.trim())return;
+  await addDoc(collection(db,'categories'),{name:name.trim(),position:categories.length});
+  await auditAdmin('create-category','',name.trim());toast('카테고리를 만들었습니다.');
+}
+async function a50RenameCategory(id){
+  const c=categories.find(x=>x.id===id);if(!c)return;const name=prompt('새 카테고리 이름',c.name);if(!name?.trim())return;
+  await updateDoc(doc(db,'categories',id),{name:name.trim()});await auditAdmin('rename-category',id,name.trim());toast('변경했습니다.');
+}
+async function a50MoveCategory(id,dir){
+  const arr=[...categories].sort((a,b)=>(a.position||0)-(b.position||0)),i=arr.findIndex(x=>x.id===id),j=i+dir;if(i<0||j<0||j>=arr.length)return;
+  await Promise.all([updateDoc(doc(db,'categories',arr[i].id),{position:arr[j].position||j}),updateDoc(doc(db,'categories',arr[j].id),{position:arr[i].position||i})]);
+  await auditAdmin('move-category',id,String(dir));setTimeout(()=>renderAdminStructure(),200);
+}
+async function a50DeleteCategory(id){
+  const c=categories.find(x=>x.id===id);if(!c)return;if(!confirm(`"${c.name}"와 하위 채널을 삭제할까요? 메시지 서브컬렉션은 별도 삭제가 필요할 수 있습니다.`))return;
+  for(const ch of channels.filter(x=>x.categoryId===id)) await deleteDoc(doc(db,'channels',ch.id));
+  await deleteDoc(doc(db,'categories',id));await auditAdmin('delete-category',id,c.name);toast('카테고리를 삭제했습니다.');
+}
+async function a50CreateChannel(catId){
+  const cat=catId?categories.find(x=>x.id===catId):null;
+  openModal(`<h3>+ 채널 생성</h3><div class="field"><label>이름</label><input id="a50NewChName"></div><div class="field"><label>카테고리</label><select id="a50NewChCat" class="table-input">${categories.map(c=>`<option value="${c.id}" ${cat?.id===c.id?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}</select></div><div class="field"><label>설명</label><input id="a50NewChTopic"></div><div class="modal-actions"><button class="btn" id="a50NewChCancel">취소</button><button class="btn btn-primary" id="a50NewChSave" style="width:auto">생성</button></div>`);
+  $('a50NewChCancel').onclick=()=>{closeModal();setTimeout(openAdminModal,0);};
+  $('a50NewChSave').onclick=async()=>{
+    const name=$('a50NewChName').value.trim(),cid=$('a50NewChCat').value;if(!name||!cid)return;
+    const pos=channels.filter(c=>c.categoryId===cid).length;
+    const r=await addDoc(collection(db,'channels'),{categoryId:cid,name,position:pos,allowedRoles:[],topic:$('a50NewChTopic').value.trim(),locked:false,archived:false});
+    await auditAdmin('create-channel',r.id,name);toast('채널을 만들었습니다.');closeModal();setTimeout(openAdminModal,100);
+  };
+}
+async function a50MoveChannel(id,dir){
+  const ch=channels.find(x=>x.id===id);if(!ch)return;
+  const arr=channels.filter(x=>x.categoryId===ch.categoryId).sort((a,b)=>(a.position||0)-(b.position||0)),i=arr.findIndex(x=>x.id===id),j=i+dir;if(i<0||j<0||j>=arr.length)return;
+  await Promise.all([updateDoc(doc(db,'channels',arr[i].id),{position:arr[j].position||j}),updateDoc(doc(db,'channels',arr[j].id),{position:arr[i].position||i})]);
+  await auditAdmin('move-channel',id,String(dir));setTimeout(()=>renderAdminStructure(),200);
+}
+function a50ManageChannel(id){
+  const ch=channels.find(x=>x.id===id);if(!ch)return;
+  openModal(`<h3>⚙ #${escapeHtml(ch.name)}</h3>
+    <div class="field"><label>채널 이름</label><input id="a50ChName" value="${escapeHtml(ch.name||'')}"></div>
+    <div class="field"><label>설명 / 주제</label><input id="a50ChTopic" value="${escapeHtml(ch.topic||'')}"></div>
+    <div class="field"><label>카테고리 이동</label><select id="a50ChCat" class="table-input">${categories.map(c=>`<option value="${c.id}" ${c.id===ch.categoryId?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}</select></div>
+    <div class="field"><label>접근 역할 (0개 = 전체 공개)</label><div class="chip-select" id="a50ChRoles">${Object.entries(ROLE_DEFS).filter(([k])=>k!=='bot').map(([k,v])=>`<div class="chip-opt ${(ch.allowedRoles||[]).includes(k)?'on':''}" data-role="${k}">${v.label}</div>`).join('')}</div></div>
+    <div class="field"><label>상태</label><div class="chip-select"><div class="chip-opt ${ch.locked?'on':''}" id="a50ChLock">🔒 쓰기 잠금</div><div class="chip-opt ${ch.archived?'on':''}" id="a50ChArchive">📦 보관</div></div></div>
+    <div class="admin50-toolbar"><button class="btn btn-sm" id="a50ChExport">JSON 내보내기</button><button class="btn btn-sm admin50-danger" id="a50ChClear">메시지 비우기</button><button class="btn btn-sm admin50-danger" id="a50ChDelete">채널 삭제</button></div>
+    <div class="modal-actions"><button class="btn" id="a50ChCancel">취소</button><button class="btn btn-primary" id="a50ChSave" style="width:auto">저장</button></div>`,true);
+  const roles=new Set(ch.allowedRoles||[]);let locked=!!ch.locked,archived=!!ch.archived;
+  document.querySelectorAll('#a50ChRoles .chip-opt').forEach(x=>x.onclick=()=>{const r=x.dataset.role;roles.has(r)?roles.delete(r):roles.add(r);x.classList.toggle('on',roles.has(r));});
+  $('a50ChLock').onclick=()=>{locked=!locked;$('a50ChLock').classList.toggle('on',locked);};
+  $('a50ChArchive').onclick=()=>{archived=!archived;$('a50ChArchive').classList.toggle('on',archived);};
+  $('a50ChCancel').onclick=()=>{closeModal();setTimeout(openAdminModal,0);};
+  $('a50ChSave').onclick=async()=>{
+    const name=$('a50ChName').value.trim();if(!name)return;
+    const newCat=$('a50ChCat').value, oldCat=ch.categoryId;
+    const data={name,topic:$('a50ChTopic').value.trim(),categoryId:newCat,allowedRoles:[...roles],locked,archived};
+    if(newCat!==oldCat)data.position=channels.filter(c=>c.categoryId===newCat).length;
+    await updateDoc(doc(db,'channels',id),data);await auditAdmin('update-channel',id,JSON.stringify(data));toast('채널 설정을 저장했습니다.');closeModal();setTimeout(openAdminModal,100);
+  };
+  $('a50ChExport').onclick=()=>a50ExportChannel(id);
+  $('a50ChClear').onclick=()=>a50ClearChannel(id);
+  $('a50ChDelete').onclick=async()=>{if(!confirm(`#${ch.name} 채널을 삭제할까요?`))return;await deleteDoc(doc(db,'channels',id));await auditAdmin('delete-channel',id,ch.name);closeModal();toast('채널을 삭제했습니다.');};
+}
+async function a50SetAllLocked(v){
+  if(!confirm(`모든 채널을 ${v?'잠금':'잠금 해제'}할까요?`))return;
+  for(const ch of channels) await updateDoc(doc(db,'channels',ch.id),{locked:v});
+  await auditAdmin(v?'lock-all-channels':'unlock-all-channels','',String(channels.length));toast('처리했습니다.');
+}
+async function a50ExportChannel(id){
+  const ch=channels.find(c=>c.id===id);if(!ch)return;
+  const q=query(collection(db,'channels',id,'messages'),orderBy('createdAt','asc'),limit(500));
+  const s=await getDocs(q);const rows=s.docs.map(d=>({id:d.id,...d.data(),createdAt:a50Date(d.data().createdAt)}));
+  a50Download(`channel_${ch.name}_${Date.now()}.json`,JSON.stringify({channel:ch,messages:rows},null,2),'application/json');
+  auditAdmin('export-channel',id,`${rows.length} messages`);
+}
+async function a50ClearChannel(id){
+  const ch=channels.find(c=>c.id===id);if(!ch)return;if(!confirm(`#${ch.name}의 최근 메시지를 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다.`))return;
+  let total=0;
+  while(true){
+    const s=await getDocs(query(collection(db,'channels',id,'messages'),limit(200)));
+    if(s.empty)break;
+    await Promise.all(s.docs.map(d=>deleteDoc(d.ref)));total+=s.size;
+    if(s.size<200)break;
+  }
+  await auditAdmin('clear-channel',id,`${total} deleted`);toast(`${total}개 메시지를 삭제했습니다.`);closeModal();
+}
+
+/* ----- content ----- */
+async function renderAdminContent(){
+  const body=$('adminBody');
+  const [an,ev]=await Promise.all([
+    getDocs(query(collection(db,'announcements'),orderBy('createdAt','desc'),limit(50))),
+    getDocs(collection(db,'events'))
+  ]);
+  const anns=an.docs.map(d=>({id:d.id,...d.data()}));
+  const events=ev.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+  body.innerHTML=`
+    <div class="admin50-toolbar"><button class="btn btn-sm" id="a50AddAnn">+ 공지</button><button class="btn btn-sm" id="a50AddEvent">+ 일정</button></div>
+    <div class="admin50-card"><h4>📢 공지 ${anns.length}개</h4>${anns.map(a=>`<div class="day-evt-row"><div><b>${escapeHtml(a.title||'')}</b><div class="admin50-muted">${escapeHtml((a.content||'').slice(0,100))}</div></div><button class="btn btn-sm" data-annedit="${a.id}">편집</button><button class="btn btn-sm admin50-danger" data-anndel="${a.id}">삭제</button></div>`).join('')||'<div class="empty">공지 없음</div>'}</div>
+    <div class="admin50-card"><h4>🗓 일정 ${events.length}개</h4>${events.map(e=>`<div class="day-evt-row"><div><b>${escapeHtml(e.title||'')}</b><div class="admin50-muted">${escapeHtml(e.date||'')}</div></div><button class="btn btn-sm" data-evedit="${e.id}">편집</button><button class="btn btn-sm admin50-danger" data-evdel="${e.id}">삭제</button></div>`).join('')||'<div class="empty">일정 없음</div>'}</div>`;
+  $('a50AddAnn').onclick=()=>a50EditAnnouncement();
+  $('a50AddEvent').onclick=()=>a50EditEvent();
+  document.querySelectorAll('[data-annedit]').forEach(b=>b.onclick=()=>a50EditAnnouncement(anns.find(a=>a.id===b.dataset.annedit)));
+  document.querySelectorAll('[data-anndel]').forEach(b=>b.onclick=async()=>{if(!confirm('공지를 삭제할까요?'))return;await deleteDoc(doc(db,'announcements',b.dataset.anndel));await auditAdmin('delete-announcement',b.dataset.anndel);renderAdminContent();});
+  document.querySelectorAll('[data-evedit]').forEach(b=>b.onclick=()=>a50EditEvent(events.find(e=>e.id===b.dataset.evedit)));
+  document.querySelectorAll('[data-evdel]').forEach(b=>b.onclick=async()=>{if(!confirm('일정을 삭제할까요?'))return;await deleteDoc(doc(db,'events',b.dataset.evdel));await auditAdmin('delete-event',b.dataset.evdel);renderAdminContent();});
+}
+function a50EditAnnouncement(a=null){
+  openModal(`<h3>${a?'공지 편집':'새 공지'}</h3><div class="field"><label>제목</label><input id="a50AnnTitle" value="${escapeHtml(a?.title||'')}"></div><div class="field"><label>내용</label><textarea class="field-ta" id="a50AnnBody">${escapeHtml(a?.content||'')}</textarea></div><div class="modal-actions"><button class="btn" id="a50AnnCancel">취소</button><button class="btn btn-primary" id="a50AnnSave" style="width:auto">저장</button></div>`);
+  $('a50AnnCancel').onclick=()=>{closeModal();setTimeout(openAdminModal,0);};
+  $('a50AnnSave').onclick=async()=>{const title=$('a50AnnTitle').value.trim(),content=$('a50AnnBody').value.trim();if(!title)return;
+    if(a)await updateDoc(doc(db,'announcements',a.id),{title,content,editedAt:serverTimestamp()});else await addDoc(collection(db,'announcements'),{title,content,createdAt:serverTimestamp(),authorId:currentUser.uid});
+    await auditAdmin(a?'edit-announcement':'create-announcement',a?.id||'',title);toast('저장했습니다.');closeModal();};
+}
+function a50EditEvent(e=null){
+  openModal(`<h3>${e?'일정 편집':'새 일정'}</h3><div class="field"><label>이름</label><input id="a50EvTitle" value="${escapeHtml(e?.title||'')}"></div><div class="field"><label>날짜</label><input type="date" id="a50EvDate" value="${escapeHtml(e?.date||'')}"></div><div class="modal-actions"><button class="btn" id="a50EvCancel">취소</button><button class="btn btn-primary" id="a50EvSave" style="width:auto">저장</button></div>`);
+  $('a50EvCancel').onclick=()=>{closeModal();setTimeout(openAdminModal,0);};
+  $('a50EvSave').onclick=async()=>{const title=$('a50EvTitle').value.trim(),date=$('a50EvDate').value;if(!title||!date)return;
+    if(e)await updateDoc(doc(db,'events',e.id),{title,date});else await addDoc(collection(db,'events'),{title,date,createdAt:serverTimestamp(),notified:[]});
+    await auditAdmin(e?'edit-event':'create-event',e?.id||'',`${title}|${date}`);toast('저장했습니다.');closeModal();};
+}
+
+/* ----- moderation ----- */
+function renderAdminModeration(){
+  const body=$('adminBody');
+  body.innerHTML=`<div class="admin50-toolbar"><select id="a50ModChannel"><option value="">채널 선택</option>${channels.filter(c=>!FEATURE_CHANNELS[c.id]).sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<option value="${c.id}">#${escapeHtml(c.name)}</option>`).join('')}</select><input id="a50ModSearch" placeholder="메시지 내용/작성자 검색"><button class="btn btn-sm" id="a50ModLoad">불러오기</button><button class="btn btn-sm" id="a50ModExport">JSON</button></div><div id="a50ModList"><div class="empty">관리할 채널을 선택하세요.</div></div>`;
+  $('a50ModLoad').onclick=a50LoadModeration;
+  $('a50ModSearch').addEventListener('input',a50LoadModeration);
+  $('a50ModExport').onclick=()=>{const id=$('a50ModChannel').value;if(id)a50ExportChannel(id);};
+}
+async function a50LoadModeration(){
+  const id=$('a50ModChannel')?.value,box=$('a50ModList');if(!id||!box)return;
+  box.innerHTML='<div class="empty">불러오는 중...</div>';
+  const s=await getDocs(query(collection(db,'channels',id,'messages'),orderBy('createdAt','desc'),limit(200)));
+  const term=($('a50ModSearch').value||'').toLowerCase();
+  const rows=s.docs.map(d=>({id:d.id,...d.data()})).filter(m=>{const u=usersMap[m.userId]||{};return !term||String(m.content||'').toLowerCase().includes(term)||String(u.nickname||'').toLowerCase().includes(term);});
+  box.innerHTML=rows.length?rows.map(m=>{const u=usersMap[m.userId]||{};return `<div class="admin50-card"><div style="display:flex;gap:8px"><div style="flex:1"><b>${escapeHtml(m.isBot?'NEXTBOT':u.nickname||'?')}</b> <span class="admin50-muted">${escapeHtml(a50Date(m.createdAt))}</span><div style="margin-top:5px;white-space:pre-wrap">${escapeHtml((m.content||'[투표/첨부]').slice(0,500))}</div></div><button class="btn btn-sm" data-modpin="${m.id}">${m.pinned?'핀 해제':'핀'}</button><button class="btn btn-sm admin50-danger" data-moddel="${m.id}">삭제</button></div></div>`}).join(''):'<div class="empty">메시지가 없습니다.</div>';
+  box.querySelectorAll('[data-moddel]').forEach(b=>b.onclick=async()=>{if(!confirm('이 메시지를 삭제할까요?'))return;await deleteDoc(doc(db,'channels',id,'messages',b.dataset.moddel));await auditAdmin('delete-message',`${id}/${b.dataset.moddel}`);a50LoadModeration();});
+  box.querySelectorAll('[data-modpin]').forEach(b=>b.onclick=async()=>{const m=rows.find(x=>x.id===b.dataset.modpin);await updateDoc(doc(db,'channels',id,'messages',m.id),{pinned:!m.pinned});await auditAdmin(m.pinned?'unpin-message':'pin-message',`${id}/${m.id}`);a50LoadModeration();});
+}
+
+/* ----- MVP ----- */
+async function renderAdminMvp(){
+  const body=$('adminBody'),wk=weekIdOf(new Date()),prev=prevWeekId(wk),ranking=await computeRanking(wk),stats=await a50GetWeekData(wk);
+  const curMvp=await getDoc(doc(db,'mvp_weeks',wk)), prevMvp=await getDoc(doc(db,'mvp_weeks',prev));
+  body.innerHTML=`
+    <div class="admin50-toolbar"><button class="btn btn-sm" id="a50MvpRefresh">↻ 새로고침</button><button class="btn btn-sm" id="a50MvpExport">CSV</button><button class="btn btn-sm admin50-danger" id="a50MvpResetStats">이번 주 통계 전체 초기화</button><button class="btn btn-sm admin50-danger" id="a50MvpResetState">이번 주 MVP 상태 삭제</button></div>
+    <div class="admin50-card"><h4>주차</h4><div>현재: <b>${wk}</b> · 이전: <b>${prev}</b></div><div class="admin50-muted">현재 MVP 문서: ${curMvp.exists()?'있음':'없음'} / 이전 MVP 문서: ${prevMvp.exists()?'있음':'없음'}</div></div>
+    <div class="admin50-card"><h4>🏆 현재 랭킹</h4>${ranking.map((r,i)=>`<div class="day-evt-row"><div><b>${i+1}. ${escapeHtml(r.nickname)}</b><div class="admin50-muted">${r.uid}</div></div><span>${r.score}점 · 💬${r.msgCount} · 👍${r.reactCount}</span><button class="btn btn-sm" data-mvpadj="${r.uid}">점수 편집</button></div>`).join('')||'<div class="empty">활동 없음</div>'}</div>
+    <div class="admin50-toolbar"><button class="btn btn-sm" id="a50MvpCreate">지난주 TOP3로 이번 주 투표 생성</button><button class="btn btn-sm" id="a50MvpTally">지난주 MVP 투표 집계</button></div>`;
+  $('a50MvpRefresh').onclick=()=>renderAdminMvp();
+  $('a50MvpExport').onclick=()=>{const rows=[['순위','UID','닉네임','메시지','리액션','점수'],...ranking.map((r,i)=>[i+1,r.uid,r.nickname,r.msgCount,r.reactCount,r.score])];a50Download(`mvp_${wk}.csv`,rows.map(r=>r.map(a50Csv).join(',')).join('\n'),'text/csv;charset=utf-8');};
+  $('a50MvpResetStats').onclick=async()=>{if(!confirm('이번 주 전체 MVP 통계를 삭제할까요?'))return;await deleteDoc(doc(db,'stats',wk));await auditAdmin('reset-week-stats',wk);toast('초기화했습니다.');renderAdminMvp();};
+  $('a50MvpResetState').onclick=async()=>{if(!curMvp.exists()){toast('삭제할 MVP 상태가 없습니다.');return;}if(!confirm('이번 주 MVP 상태 문서를 삭제할까요?'))return;await deleteDoc(doc(db,'mvp_weeks',wk));mvpCycleChecked=false;await auditAdmin('reset-mvp-state',wk);toast('삭제했습니다.');renderAdminMvp();};
+  $('a50MvpCreate').onclick=async()=>{if(curMvp.exists()){toast('이번 주 MVP 문서가 이미 있습니다.');return;}await createWeeklyMvpPoll(wk,prev);await auditAdmin('manual-create-mvp-poll',wk,prev);toast('생성 요청을 완료했습니다.');renderAdminMvp();};
+  $('a50MvpTally').onclick=async()=>{if(!prevMvp.exists()){toast('지난주 MVP 상태가 없습니다.');return;}await tallyAndAnnounceMvp(prev,prevMvp.data());await auditAdmin('manual-tally-mvp',prev);toast('집계를 실행했습니다.');renderAdminMvp();};
+  document.querySelectorAll('[data-mvpadj]').forEach(b=>b.onclick=()=>a50EditMvpUser(b.dataset.mvpadj,stats));
+}
+function a50EditMvpUser(uid,stats){
+  const u=usersMap[uid]||{},m=Number(stats.msgCount?.[uid]||0),r=Number(stats.reactCount?.[uid]||0),wk=weekIdOf(new Date());
+  openModal(`<h3>MVP 점수 편집 — ${escapeHtml(u.nickname||uid)}</h3><div class="field"><label>메시지 수</label><input type="number" min="0" id="a50MvpMsg" value="${m}"></div><div class="field"><label>받은 리액션 수</label><input type="number" min="0" id="a50MvpReact" value="${r}"></div><div class="modal-actions"><button class="btn" id="a50MvpCancel">취소</button><button class="btn btn-primary" id="a50MvpSave" style="width:auto">저장</button></div>`);
+  $('a50MvpCancel').onclick=()=>{closeModal();setTimeout(openAdminModal,0);};
+  $('a50MvpSave').onclick=async()=>{const s=await a50GetWeekData(wk),mc={...(s.msgCount||{})},rc={...(s.reactCount||{})};mc[uid]=Math.max(0,Number($('a50MvpMsg').value)||0);rc[uid]=Math.max(0,Number($('a50MvpReact').value)||0);await setDoc(doc(db,'stats',wk),{weekId:wk,msgCount:mc,reactCount:rc,updatedAt:serverTimestamp()},{merge:true});await auditAdmin('edit-mvp-score',uid,`m=${mc[uid]},r=${rc[uid]}`);toast('점수를 저장했습니다.');closeModal();};
+}
+
+/* ----- system ----- */
+async function renderAdminSystem(){
+  const body=$('adminBody');
+  const appSnap=await getDoc(doc(db,'settings','app'));
+  const app=appSnap.exists()?appSnap.data():{};
+  body.innerHTML=`
+    <div class="admin50-card"><h4>📣 관리자 배너</h4><div class="field"><label>배너 문구</label><input id="a50BannerText" value="${escapeHtml(app.bannerText||'')}"></div><div class="chip-select"><div class="chip-opt ${app.bannerEnabled?'on':''}" id="a50BannerToggle">배너 ${app.bannerEnabled?'ON':'OFF'}</div></div><button class="btn btn-sm" style="margin-top:10px" id="a50BannerSave">저장</button></div>
+    <div class="admin50-card"><h4>📢 전체 방송</h4><div class="field"><label>내용</label><textarea class="field-ta" id="a50BroadcastText"></textarea></div><div class="admin50-toolbar"><button class="btn btn-sm" id="a50BroadcastBot">봇 채널 방송</button><button class="btn btn-sm" id="a50BroadcastNotif">전체 알림</button></div></div>
+    <div class="admin50-card"><h4>🔒 전체 채널 제어</h4><div class="admin50-toolbar"><button class="btn btn-sm" id="a50SysLock">전체 잠금</button><button class="btn btn-sm" id="a50SysUnlock">전체 잠금 해제</button><button class="btn btn-sm" id="a50SysUnarchive">전체 보관 해제</button></div></div>
+    <div class="admin50-card"><h4>🧪 Firebase 상태 점검</h4><div id="a50HealthText" class="admin50-muted">아직 점검하지 않았습니다.</div><button class="btn btn-sm" id="a50Health">읽기/쓰기 점검</button></div>
+    <div class="admin50-card"><h4>💾 관리자 백업</h4><div class="admin50-toolbar"><button class="btn btn-sm" id="a50Backup">구조/사용자/설정 JSON</button><button class="btn btn-sm" id="a50ProjectInfo">프로젝트 정보 복사</button></div></div>`;
+  let enabled=!!app.bannerEnabled;
+  $('a50BannerToggle').onclick=()=>{enabled=!enabled;$('a50BannerToggle').classList.toggle('on',enabled);$('a50BannerToggle').textContent=`배너 ${enabled?'ON':'OFF'}`;};
+  $('a50BannerSave').onclick=async()=>{await setDoc(doc(db,'settings','app'),{bannerEnabled:enabled,bannerText:$('a50BannerText').value.trim(),updatedAt:serverTimestamp()},{merge:true});await auditAdmin('update-admin-banner','settings/app',String(enabled));toast('배너를 저장했습니다.');};
+  $('a50BroadcastBot').onclick=async()=>{const t=$('a50BroadcastText').value.trim();if(!t)return;await sendBotMessage(BOT_CHANNEL_ID,`📢 관리자 방송\n${t}`);await auditAdmin('broadcast-bot','',t);toast('방송했습니다.');};
+  $('a50BroadcastNotif').onclick=async()=>{const t=$('a50BroadcastText').value.trim();if(!t)return;for(const u of a50VisibleUsers()){const nr=push(ref(rtdb,'notifications/'+u.uid));await set(nr,{kind:'admin',channelId:BOT_CHANNEL_ID,channelName:'봇-알림',fromNickname:myDoc.nickname||'관리자',text:t.slice(0,240),createdAt:Date.now(),read:false});}await auditAdmin('broadcast-notification','',t);toast('전체 알림을 보냈습니다.');};
+  $('a50SysLock').onclick=()=>a50SetAllLocked(true);$('a50SysUnlock').onclick=()=>a50SetAllLocked(false);
+  $('a50SysUnarchive').onclick=async()=>{if(!confirm('모든 채널의 보관 상태를 해제할까요?'))return;for(const ch of channels)await updateDoc(doc(db,'channels',ch.id),{archived:false});await auditAdmin('unarchive-all-channels');toast('완료했습니다.');};
+  $('a50Health').onclick=a50HealthCheck;
+  $('a50Backup').onclick=a50AdminBackup;
+  $('a50ProjectInfo').onclick=()=>a50Copy(`projectId=${firebaseConfig.projectId}\nauthDomain=${firebaseConfig.authDomain}\ndatabaseURL=${firebaseConfig.databaseURL}`);
+}
+async function a50HealthCheck(){
+  const box=$('a50HealthText');box.textContent='점검 중...';
+  const results=[];
+  try{await getDoc(doc(db,'settings','dday'));results.push('Firestore 읽기 ✅');}catch(e){results.push('Firestore 읽기 ❌ '+e.code);}
+  try{await setDoc(doc(db,'admin_health',currentUser.uid),{checkedAt:serverTimestamp()},{merge:true});results.push('Firestore 관리자 쓰기 ✅');}catch(e){results.push('Firestore 관리자 쓰기 ❌ '+e.code);}
+  try{await set(ref(rtdb,'admin_health/'+currentUser.uid),{at:Date.now()});results.push('RTDB 관리자 쓰기 ✅');await remove(ref(rtdb,'admin_health/'+currentUser.uid));}catch(e){results.push('RTDB 관리자 쓰기 ❌ '+(e.code||e.message));}
+  box.innerHTML=results.map(x=>`<div>${escapeHtml(x)}</div>`).join('');
+  auditAdmin('firebase-health-check','',results.join(' | '));
+}
+async function a50AdminBackup(){
+  const settings={};
+  for(const id of ['dday','app']){const s=await getDoc(doc(db,'settings',id));if(s.exists())settings[id]=s.data();}
+  const backup={exportedAt:new Date().toISOString(),projectId:firebaseConfig.projectId,categories,channels,users:a50VisibleUsers().map(u=>({...u,lastSeen:a50Date(u.lastSeen)})),settings};
+  a50Download(`nextbot_admin_backup_${Date.now()}.json`,JSON.stringify(backup,null,2),'application/json');
+  auditAdmin('admin-backup');
+}
+
+/* ----- audit ----- */
+async function renderAdminAudit(){
+  const body=$('adminBody');
+  const s=await getDocs(query(collection(db,'admin_logs'),orderBy('createdAt','desc'),limit(100)));
+  const logs=s.docs.map(d=>({id:d.id,...d.data()}));
+  body.innerHTML=`<div class="admin50-toolbar"><input id="a50AuditSearch" placeholder="행동/대상/관리자 검색"><button class="btn btn-sm" id="a50AuditExport">JSON</button><button class="btn btn-sm admin50-danger" id="a50AuditClear">최근 로그 삭제</button></div><div id="a50AuditList"></div>`;
+  const draw=()=>{const term=($('a50AuditSearch').value||'').toLowerCase();const arr=logs.filter(l=>!term||[l.action,l.target,l.adminNickname,l.detail].some(x=>String(x||'').toLowerCase().includes(term)));$('a50AuditList').innerHTML=arr.map(l=>`<div class="admin50-log"><b>${escapeHtml(l.action||'')}</b> · ${escapeHtml(l.adminNickname||'')} <span class="admin50-muted">${escapeHtml(a50Date(l.createdAt))}</span><div class="admin50-muted">${escapeHtml(l.target||'')} ${escapeHtml(l.detail||'')}</div></div>`).join('')||'<div class="empty">로그 없음</div>';};
+  $('a50AuditSearch').addEventListener('input',draw);draw();
+  $('a50AuditExport').onclick=()=>a50Download(`admin_logs_${Date.now()}.json`,JSON.stringify(logs.map(l=>({...l,createdAt:a50Date(l.createdAt)})),null,2),'application/json');
+  $('a50AuditClear').onclick=async()=>{if(!confirm(`화면에 불러온 최근 ${logs.length}개 로그를 삭제할까요?`))return;await Promise.all(logs.map(l=>deleteDoc(doc(db,'admin_logs',l.id))));toast('삭제했습니다.');renderAdminAudit();};
+}
+
+/* ----- global admin settings behavior ----- */
+let adminAppSettings={};
+function listenAdminAppSettings(){
+  onSnapshot(doc(db,'settings','app'),snap=>{
+    adminAppSettings=snap.exists()?snap.data():{};
+    let b=$('systemAdminBanner');
+    if(!b){b=document.createElement('div');b.id='systemAdminBanner';document.body.appendChild(b);}
+    const on=!!adminAppSettings.bannerEnabled && !!String(adminAppSettings.bannerText||'').trim();
+    b.style.display=on?'block':'none';b.textContent=adminAppSettings.bannerText||'';
+  },e=>console.warn('app settings listener',e));
+}
+function applyCurrentChannelAdminState(){
+  if(!currentChannelId)return;
+  const ch=channels.find(c=>c.id===currentChannelId);
+  if(!ch)return;
+  const locked=!!ch.locked && !myDoc?.isAdmin;
+  const composer=document.querySelector('.composer-wrap');
+  if(composer)composer.style.opacity=locked?'.55':'';
+  if(msgInput){msgInput.disabled=locked;msgInput.placeholder=locked?'🔒 관리자가 이 채널의 쓰기를 잠갔습니다.':(botModeOn?'🤖 봇으로 메시지 보내는 중... (Alt+T로 끄기)':'메시지 보내기... (@ 로 멘션)');}
+  if($('sendBtn'))$('sendBtn').disabled=locked || (!msgInput.value.trim()&&!pendingAttachments.length);
+  let note=$('adminChannelLockNote');
+  if(locked&&!note){note=document.createElement('div');note.id='adminChannelLockNote';note.className='admin50-locknote';note.textContent='🔒 이 채널은 관리자가 쓰기 잠금했습니다.';$('chatView')?.insertBefore(note,$('msgList'));}
+  if(!locked&&note)note.remove();
 }
 
 /* ---------------- Modal helper ---------------- */
+
 function openModal(innerHtml, wide=false){
   closeModal();
   const bg=document.createElement('div'); bg.className='modal-bg'; bg.id='modalBg';
