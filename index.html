@@ -962,6 +962,7 @@ function exitApp(){
   if(msgUnsub) msgUnsub(); 
   if(currentUser===null && presenceSet){ presenceSet=false; }
   botModeOn=false;
+  mvpCycleChecked=false;
 }
 
 /* ---------------- App bootstrap ---------------- */
@@ -1055,6 +1056,10 @@ function listenUsers(){
     }
     renderMemberPanel();
     renderPresence(presenceData);
+
+    // MVP 계산은 usersMap이 채워진 뒤 시작해야 후보 닉네임/권한 판정이 정상 작동합니다.
+    // mvpCycleChecked가 중복 실행을 막아주므로 onSnapshot 안에서 호출해도 최초 1회만 실행됩니다.
+    checkWeeklyMvpCycle();
   });
 }
 
@@ -1490,11 +1495,26 @@ async function toggleReaction(msgId, emoji){
   const mref=doc(db,'channels',currentChannelId,'messages',msgId);
   const snap=await getDoc(mref);
   if(!snap.exists()) return;
-  const reactions = snap.data().reactions || {};
+  const msg=snap.data();
+  const reactions = msg.reactions || {};
   const uids = reactions[emoji] || [];
   const has = uids.includes(currentUser.uid);
   const field='reactions.'+emoji;
-  await updateDoc(mref, { [field]: has ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid) });
+
+  try{
+    await updateDoc(mref, { [field]: has ? arrayRemove(currentUser.uid) : arrayUnion(currentUser.uid) });
+
+    // MVP의 '리액션 점수'는 리액션을 누른 사람 점수가 아니라
+    // 그 리액션을 받은 메시지 작성자의 점수입니다. 자기 글 셀프 리액션/봇 글은 제외합니다.
+    const authorUid=msg.userId;
+    if(authorUid && authorUid!==currentUser.uid && authorUid!=='BOT' && !msg.isBot){
+      try{ await bumpStat('reactCount', authorUid, has ? -1 : 1); }
+      catch(e){ toast('리액션은 반영됐지만 MVP 통계 기록에 실패했어요. Firebase 권한을 확인해주세요.'); }
+    }
+  }catch(e){
+    console.error('reaction update error', e);
+    toast('리액션 처리 중 오류가 발생했어요.');
+  }
 }
 function openReactionPicker(anchorEl, msgId){
   document.querySelectorAll('.reaction-pop').forEach(p=>p.remove());
@@ -1574,7 +1594,10 @@ async function sendMessage(){
     await addDoc(collection(db,'channels',currentChannelId,'messages'), payload);
     updateDoc(doc(db,'channels',currentChannelId), { lastMessageAt: serverTimestamp() }).catch(()=>{});
     pushMentionNotifications(payload.mentions, text);
-    bumpStat('msgCount', currentUser.uid);
+    // /순위를 바로 실행해도 방금 보낸 메시지가 포함되도록 통계 기록을 기다립니다.
+    // 통계 권한 설정이 잘못돼도 이미 성공한 메시지 전송 자체를 실패로 처리하지는 않습니다.
+    try{ await bumpStat('msgCount', currentUser.uid); }
+    catch(e){ toast('메시지는 전송됐지만 MVP 통계 기록에 실패했어요. Firebase 권한을 확인해주세요.'); }
     msgInput.value=''; msgInput.style.height='auto';
     replyTarget=null; renderReplyPreview();
     pendingAttachments=[]; renderAttachPreview();
@@ -1601,7 +1624,7 @@ async function sendBotMessage(channelId, content, actingUid){
 }
 function postBotReply(text){
   const target = (currentChannelId && !FEATURE_CHANNELS[currentChannelId]) ? currentChannelId : BOT_CHANNEL_ID;
-  sendBotMessage(target, text);
+  return sendBotMessage(target, text);
 }
 
 /* ---------------- MVP 자동 선정: 주간 활동 통계 + 투표 + 발표 ---------------- */
@@ -1624,26 +1647,55 @@ function prevWeekId(weekId){
   dt.setDate(dt.getDate()-7);
   return weekIdOf(dt);
 }
-function bumpStat(field, uid, n=1){
-  if(!uid) return;
+async function bumpStat(field, uid, n=1){
+  if(!uid || !n) return;
   const wk=weekIdOf(new Date());
-  setDoc(doc(db,'stats',wk), { [field]: { [uid]: increment(n) } }, { merge:true }).catch(e=>console.error('stat bump error', e));
+  const sref=doc(db,'stats',wk);
+  try{
+    // 트랜잭션으로 동시 업데이트를 안전하게 처리하고, 리액션 취소 시 0 아래로 내려가지 않게 합니다.
+    await runTransaction(db, async tx=>{
+      const snap=await tx.get(sref);
+      const data=snap.exists() ? snap.data() : {};
+      const cur=Number((data[field]||{})[uid])||0;
+      const next=Math.max(0, cur+n);
+      if(snap.exists()){
+        tx.update(sref, { [`${field}.${uid}`]:next, updatedAt:serverTimestamp() });
+      }else{
+        tx.set(sref, { weekId:wk, [field]:{ [uid]:next }, updatedAt:serverTimestamp() });
+      }
+    });
+  }catch(e){
+    console.error('stat bump error', e);
+    throw e;
+  }
 }
 async function computeRanking(weekId){
   const snap=await getDoc(doc(db,'stats',weekId));
   const data = snap.exists() ? snap.data() : {};
   const msgCount = data.msgCount||{}, reactCount = data.reactCount||{};
   const uids = new Set([...Object.keys(msgCount), ...Object.keys(reactCount)]);
+
+  // users onSnapshot이 아직 첫 데이터를 받기 전 /순위를 실행해도 닉네임을 찾을 수 있게 보강
+  const missing=[...uids].filter(uid=>!usersMap[uid]);
+  await Promise.all(missing.map(async uid=>{
+    try{
+      const us=await getDoc(doc(db,'users',uid));
+      if(us.exists()) usersMap[uid]={ uid, ...us.data() };
+    }catch(e){ console.warn('ranking user load failed', uid, e); }
+  }));
+
   const rows=[];
   uids.forEach(uid=>{
     const u = usersMap[uid];
     if(!u || u.isBot) return;
-    if(u.isAdmin) return; // 관리자는 MVP 후보에서 제외
-    const m=msgCount[uid]||0, r=reactCount[uid]||0;
+    // 앱에서 관리자 권한으로 취급하는 계정(관리자/팀장/선생님)은 MVP 후보 제외
+    const roles=u.roles||[];
+    if(u.isAdmin || roles.includes('leader') || roles.includes('teacher')) return;
+    const m=Number(msgCount[uid])||0, r=Number(reactCount[uid])||0;
     const score = m*MVP_MSG_WEIGHT + r*MVP_REACT_WEIGHT;
     if(score>0) rows.push({ uid, nickname:u.nickname||'?', msgCount:m, reactCount:r, score });
   });
-  rows.sort((a,b)=>b.score-a.score);
+  rows.sort((a,b)=>b.score-a.score || b.reactCount-a.reactCount || b.msgCount-a.msgCount || a.nickname.localeCompare(b.nickname));
   return rows;
 }
 async function createWeeklyMvpPoll(curWeek, statsWeek){
@@ -1652,7 +1704,9 @@ async function createWeeklyMvpPoll(curWeek, statsWeek){
     const ranking = await computeRanking(statsWeek);
     const top = ranking.slice(0, MVP_TOP_N);
     if(top.length<2){
-      await setDoc(ref, { weekId:curWeek, statsWeek, skipped:true, reason:'참여 인원 부족', createdAt: serverTimestamp() });
+      // 지난주 통계가 아직 없거나 후보가 1명뿐이면 이번 접속에서는 아무 것도 만들지 않습니다.
+      // skipped 문서를 영구 생성하면 이후 데이터가 생겨도 다시 시도할 수 없기 때문입니다.
+      console.info('MVP poll skipped for now: not enough participants', {curWeek, statsWeek, count:top.length});
       return;
     }
     const pollPayload = {
@@ -1679,8 +1733,16 @@ async function tallyAndAnnounceMvp(weekId, state){
     const msnap=await getDoc(mref);
     if(!msnap.exists()){ await updateDoc(doc(db,'mvp_weeks',weekId), { tallyDone:true }); return; }
     const options = msnap.data().options||[];
-    let bestIdx=0, bestVotes=-1;
-    options.forEach((o,i)=>{ const v=(o.votes||[]).length; if(v>bestVotes){ bestVotes=v; bestIdx=i; } });
+    const voteCounts=options.map(o=>(o.votes||[]).length);
+    const bestVotes=voteCounts.length ? Math.max(...voteCounts) : 0;
+    if(bestVotes<=0){
+      await sendBotMessage(state.pollChannelId, '🏆 이번 MVP 투표는 참여자가 없어 우승자를 선정하지 않았어요.');
+      await updateDoc(doc(db,'mvp_weeks',weekId), { tallyDone:true, noWinner:true, announcedAt:serverTimestamp() });
+      return;
+    }
+    const tied=voteCounts.map((v,i)=>v===bestVotes?i:-1).filter(i=>i>=0);
+    // 동률이면 후보 선정 당시 활동 점수가 더 높은 사람을 우선합니다.
+    const bestIdx=tied.sort((a,b)=>((state.top3||[])[b]?.score||0)-((state.top3||[])[a]?.score||0))[0];
     const winner = (state.top3||[])[bestIdx];
     if(winner){
       await sendBotMessage(state.pollChannelId,
@@ -1714,10 +1776,13 @@ async function checkWeeklyMvpCycle(){
 async function showCurrentRanking(){
   const wk=weekIdOf(new Date());
   const ranking = await computeRanking(wk);
-  if(!ranking.length){ postBotReply('📊 이번 주는 아직 집계된 활동이 없어요.'); return; }
+  if(!ranking.length){
+    await postBotReply('📊 이번 주는 아직 집계된 활동이 없어요. (패치 적용 전 활동은 통계에 없을 수 있어요.)');
+    return;
+  }
   const top=ranking.slice(0,5);
-  postBotReply(`📊 이번 주 채팅 활동 랭킹 (진행 중 · 관리자 제외)\n` +
-    top.map((c,i)=>`${i+1}. ${c.nickname} — ${c.score}점 (메시지 ${c.msgCount} / 리액션 ${c.reactCount})`).join('\n'));
+  await postBotReply(`📊 이번 주 채팅 활동 랭킹 (진행 중 · 관리자 제외)\n` +
+    top.map((c,i)=>`${i+1}. ${c.nickname} — ${c.score}점 (메시지 ${c.msgCount} / 받은 리액션 ${c.reactCount})`).join('\n'));
 }
 
 function toggleBotMode(){
